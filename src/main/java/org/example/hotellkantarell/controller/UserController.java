@@ -1,15 +1,14 @@
 package org.example.hotellkantarell.controller;
 
-import jakarta.validation.Valid;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.service.UserService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@RestController
+@Controller
 public class UserController {
 
     final UserService userService;
@@ -18,13 +17,28 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/register")
+    public String showRegisterForm() {
+        return "register";
+    }
+
     @PostMapping("/register")
-    String registerUser(@Valid @RequestBody RegisterRequest request) {
-        return userService.register(request);
+    public String registerUser(
+            @RequestParam String email,
+            @RequestParam String rawPassword,
+            @RequestParam String name
+    ) {
+        return userService.register(name, email, rawPassword) ? "redirect:/login" : "redirect:/register";
     }
 
     @GetMapping("/login")
-    String loginUser(@RequestBody LoginRequest request) {
-        return userService.login(request);
+    public String showLoginForm() {
+        return "login";
     }
+
+    @PostMapping("/login")
+    public String loginUser(@RequestParam String email, @RequestParam String rawPassword) {
+        return userService.login(email, rawPassword) ? "start" : "redirect:/login";
+    }
+
 }
