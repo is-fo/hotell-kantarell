@@ -6,6 +6,7 @@ import org.example.hotellkantarell.repository.RoomRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("rooms")
@@ -22,22 +23,33 @@ public class RoomController {
         return roomRepository.findAll();
     }
 
-    @PutMapping("room/edit/{id}")
-    public List<Room> editRoom(@RequestBody Room room) {
-        roomRepository.save(room);
-        return roomRepository.findAll();
+    @PostMapping("room/edit/{id}")
+    public List<Room> editRoom(@RequestBody Room room, @PathVariable long id) {
+        room.setId(id);
+        Room updatedRoom = roomRepository.save(room);
+        updatedRoom.setMessage("Rummet uppdaterades");
+        return List.of(updatedRoom);
     }
 
-    @RequestMapping("room/delete/{id}")
+    @DeleteMapping("room/delete/{id}")
     public List<Room> deleteById(@PathVariable long id) {
-        roomRepository.deleteById(id);
-        return roomRepository.findAll();
+        Optional<Room> room = roomRepository.findById(id);
+        if (room.isPresent()) {
+            Room deletedRoom = room.get();
+            deletedRoom.setMessage("Rummet togs bort");
+            return List.of(deletedRoom);
+        } else {
+            Room fakeRoom = new Room();
+            fakeRoom.setMessage("Rummet hittas inte");
+            return List.of(fakeRoom);
+        }
     }
 
-    @RequestMapping("room/add")
+    @PostMapping("room")
     public List<Room> addRoom(@RequestBody Room room) {
-        roomRepository.save(room);
-        return roomRepository.findAll();
+        Room savedRoom = roomRepository.save(room);
+        savedRoom.setMessage("Rummet lades till");
+        return List.of(savedRoom);
     }
 
 }
