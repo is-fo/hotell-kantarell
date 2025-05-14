@@ -25,19 +25,8 @@ public class TestSQLConnection implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-        userRepository.deleteAll();
-        userRepository.save(
-                new User(
-                        "Samme Eriksson",
-                        "finalboss@samhall.se"
-                )
-        );
-        User user = userRepository.findByEmail("finalboss@samhall.se");
-        Room room = new Room(1, 2);
-        roomRepository.save(room);
-        Booking booking = new Booking(room, user, new Date(), DateUtil.nDaysInFuture(3));
-        bookingRepository.save(booking);
-
+//        bookingRepository.deleteAll();
+//        userRepository.deleteAll();
+//        roomRepository.deleteAll();
     }
 }

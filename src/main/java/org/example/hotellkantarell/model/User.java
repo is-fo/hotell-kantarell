@@ -23,8 +23,16 @@ public class User {
     @Email
     String email;
 
+    String passwordHash;
+
     public User(String name, String email) {
         this.name = name;
         this.email = email;
+    }
+
+    public User(String name, String email, String passwordHash) {
+        this.name = name;
+        this.email = email;
+        this.passwordHash = passwordHash;
     }
 }
