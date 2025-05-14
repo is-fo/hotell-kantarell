@@ -29,6 +29,9 @@ public class Booking {
 
     Date endDate;
 
+    @Transient
+    String message;
+
     public Booking(Room room, User user, Date startDate, Date endDate) {
         this.room = room;
         this.user = user;
