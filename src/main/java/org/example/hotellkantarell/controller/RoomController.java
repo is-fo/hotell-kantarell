@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("rooms")
+@RequestMapping("/rooms")
 public class RoomController {
 
     private final RoomRepository roomRepository;
@@ -23,33 +23,37 @@ public class RoomController {
         return roomRepository.findAll();
     }
 
-    @PostMapping("room/edit/{id}")
-    public List<Room> editRoom(@RequestBody Room room, @PathVariable long id) {
+    @PatchMapping("/room/{id}")
+    public String editRoom(@RequestBody Room room, @PathVariable Long id) {
         room.setId(id);
-        Room updatedRoom = roomRepository.save(room);
-        updatedRoom.setMessage("Rummet uppdaterades");
-        return List.of(updatedRoom);
+        try {
+            roomRepository.save(room);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Misslyckades med att uppdatera: " + e.getMessage();
+        }
+        return "Uppdaterade: " + room;
     }
 
-    @DeleteMapping("room/delete/{id}")
-    public List<Room> deleteById(@PathVariable long id) {
+    @DeleteMapping("/room/{id}")
+    public String deleteById(@PathVariable Long id) {
         Optional<Room> room = roomRepository.findById(id);
         if (room.isPresent()) {
-            Room deletedRoom = room.get();
-            deletedRoom.setMessage("Rummet togs bort");
-            return List.of(deletedRoom);
+            return "Tog bort: " + room.get();
         } else {
-            Room fakeRoom = new Room();
-            fakeRoom.setMessage("Rummet hittas inte");
-            return List.of(fakeRoom);
+            return "Kunde inte hitta ett rum med id: " + id;
         }
     }
 
-    @PostMapping("room")
-    public List<Room> addRoom(@RequestBody Room room) {
-        Room savedRoom = roomRepository.save(room);
-        savedRoom.setMessage("Rummet lades till");
-        return List.of(savedRoom);
+    @PostMapping("/room")
+    public String addRoom(@RequestBody Room room) {
+        try {
+            roomRepository.save(room);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Kunde inte lägga till rummet: " + e.getMessage();
+        }
+        return "La till: " + room;
     }
 
 }

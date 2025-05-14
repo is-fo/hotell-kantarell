@@ -25,12 +25,13 @@ public class Room {
     @Max(2)
     Integer extraBeds;
 
-    @Transient
-    String message;
+    @Min(0)
+    Integer area = 10;
 
-    public Room(Integer beds, Integer extraBeds) {
+    public Room(Integer beds, Integer extraBeds, Integer area) {
         this.beds = beds;
         this.extraBeds = extraBeds;
+        this.area = area;
     }
 
 }
