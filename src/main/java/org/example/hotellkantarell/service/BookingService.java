@@ -16,34 +16,21 @@ import java.util.stream.Collectors;
 @Service
 public class BookingService {
 
-    private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
 
-    public BookingService(UserRepository userRepository, RoomRepository roomRepository, BookingRepository bookingRepository) {
-        this.userRepository = userRepository;
+    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
     }
 
-    public String createBooking(Booking booking) {
-        if (booking.getStartDate().after(booking.getEndDate())) {
-            return "Startdatumet måste vara före slutdatumet";
-        }
-
-        boolean isDoubleBooked = bookingRepository
-                .findByRoomId(booking.getRoom().getId())
-                .stream()
-                .anyMatch(existing ->
-                        booking.getStartDate().before(existing.getEndDate()) &&
-                                booking.getEndDate().after(existing.getStartDate()));
-
-        if (isDoubleBooked) {
-            return "Rummet är redan uppbokat under denna period";
+    public boolean createBooking(Booking booking) {
+        if (booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
+            return false;
         }
 
         bookingRepository.save(booking);
-        return "Bokningen är nu gjord";
+        return true;
     }
 
     public List<Room> findAvailableRooms(Date startDate, Date endDate, int guests) {
@@ -66,37 +53,32 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    public String updateBooking(Long id, Booking booking) {
+    public boolean updateBooking(Long id, Booking booking) {
         Booking existing = bookingRepository.findById(id).orElse(null);
-        if (existing == null) {
-            return "Bokning med ID " + id + " finns inte.";
-        }
-
-        boolean isDoubleBooked = bookingRepository
-                .findByRoomId(booking.getRoom().getId())
-                .stream()
-                .filter(b -> !b.getId().equals(id))
-                .anyMatch(existingBooking ->
-                        booking.getStartDate().before(existingBooking.getEndDate()) &&
-                                booking.getEndDate().after(existingBooking.getStartDate()));
-
-        if (isDoubleBooked) {
-            return "Det finns redan en bokning för detta rum under valt datumintervall.";
+        if (existing == null || isRoomDoubleBooked(booking)) {
+            return false;
         }
 
         booking.setId(id);
         bookingRepository.save(booking);
-        return "Bokningen har uppdaterats.";
+        return true;
     }
 
-    public String deleteBooking(Long id) {
+    public boolean deleteBooking(Long id) {
         if (!bookingRepository.existsById(id)) {
-            return "Bokning finns inte.";
+            return false;
         }
 
         bookingRepository.deleteById(id);
-        return "Bokning har tagits bort.";
+        return true;
     }
 
-
+    private boolean isRoomDoubleBooked(Booking booking) {
+        return bookingRepository.findByRoomId(booking.getRoom().getId())
+                .stream()
+                .filter(existing -> !existing.getId().equals(booking.getId()))
+                .anyMatch(existing ->
+                        booking.getStartDate().before(existing.getEndDate()) &&
+                                booking.getEndDate().after(existing.getStartDate()));
+    }
 }
