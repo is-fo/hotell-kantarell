@@ -4,53 +4,52 @@ package org.example.hotellkantarell.controller;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.repository.BookingRepository;
+import org.example.hotellkantarell.service.BookingService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
 
-   private final BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository;
+    private final BookingService bookingService;
 
-    BookingController(BookingRepository bookingRepository) {
+    public BookingController(BookingRepository bookingRepository, BookingService bookingService) {
         this.bookingRepository = bookingRepository;
+        this.bookingService = bookingService;
     }
 
     @GetMapping
-    public List<Booking> getAllBookings(){
+    public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
 
     @PostMapping("/booking")
     public String addBooking(@RequestBody Booking booking) {
-
-        Booking savedBooking = bookingRepository.save(booking);
-        return "La till: " + savedBooking;
+        return bookingService.createBooking(booking);
     }
 
     @PatchMapping("/booking/{id}")
     public String editBooking(@RequestBody Booking booking, @PathVariable Long id) {
-        booking.setId(id);
-        try {
-            bookingRepository.save(booking);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Misslyckades med att uppdatera: " + e.getMessage();
-        }
-        return "Uppdaterade: " + booking;
+        return bookingService.updateBooking(id, booking);
     }
 
     @DeleteMapping("/booking/{id}")
     public String deleteBooking(@PathVariable long id) {
-        Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isPresent()) {
-            bookingRepository.deleteById(id);
-            return "Tog bort: " + booking.get();
-        } else {
-            return "Hittade inte bokning med id: " + id;
-        }
+        return bookingService.deleteBooking(id);
+    }
+
+    @GetMapping("/available")
+    public List<Room> findAvailableRooms(
+            @RequestParam Date start,
+            @RequestParam Date end,
+            @RequestParam int guests
+    ) {
+        return bookingService.findAvailableRooms(start, end, guests);
     }
 }
