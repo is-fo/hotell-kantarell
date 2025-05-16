@@ -16,22 +16,16 @@ import java.util.stream.Collectors;
 @Service
 public class BookingService {
 
-    private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
 
-    public BookingService(UserRepository userRepository, RoomRepository roomRepository, BookingRepository bookingRepository) {
-        this.userRepository = userRepository;
+    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
     }
 
     public boolean createBooking(Booking booking) {
-        if (booking.getStartDate().after(booking.getEndDate())) {
-            return false;
-        }
-
-        if (isRoomDoubleBooked(booking, null)) {
+        if (booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
             return false;
         }
 
@@ -61,11 +55,7 @@ public class BookingService {
 
     public boolean updateBooking(Long id, Booking booking) {
         Booking existing = bookingRepository.findById(id).orElse(null);
-        if (existing == null) {
-            return false;
-        }
-
-        if (isRoomDoubleBooked(booking, id)) {
+        if (existing == null || isRoomDoubleBooked(booking)) {
             return false;
         }
 
@@ -83,10 +73,10 @@ public class BookingService {
         return true;
     }
 
-    private boolean isRoomDoubleBooked(Booking booking, Long excludeBookingId) {
+    private boolean isRoomDoubleBooked(Booking booking) {
         return bookingRepository.findByRoomId(booking.getRoom().getId())
                 .stream()
-                .filter(existing -> !existing.getId().equals(excludeBookingId))
+                .filter(existing -> !existing.getId().equals(booking.getId()))
                 .anyMatch(existing ->
                         booking.getStartDate().before(existing.getEndDate()) &&
                                 booking.getEndDate().after(existing.getStartDate()));

@@ -4,97 +4,107 @@ import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
-import org.example.hotellkantarell.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
 
-    private BookingRepository bookingRepository;
+    @Mock
     private RoomRepository roomRepository;
-    private UserRepository userRepository;
+
+    @Mock
+    private BookingRepository bookingRepository;
+
     private BookingService bookingService;
 
     @BeforeEach
     void setUp() {
-        bookingRepository = mock(BookingRepository.class);
-        roomRepository = mock(RoomRepository.class);
-        userRepository = mock(UserRepository.class);
-        bookingService = new BookingService(userRepository, roomRepository, bookingRepository);
+        bookingService = new BookingService(roomRepository, bookingRepository);
     }
 
-    // Testar isRoomDoubleBooked indirekt via createBooking
     @Test
     void createBookingWhenRoomIsDoubleBooked() {
         Room room = new Room();
         room.setId(1L);
 
         Booking existingBooking = new Booking();
+        existingBooking.setId(1L);
         existingBooking.setStartDate(date("2025-05-10"));
         existingBooking.setEndDate(date("2025-05-20"));
         existingBooking.setRoom(room);
 
         Booking newBooking = new Booking();
-        newBooking.setStartDate(date("2025-05-15")); // överlappar existingBooking
+        newBooking.setId(2L);
+        newBooking.setStartDate(date("2025-05-15"));
         newBooking.setEndDate(date("2025-05-25"));
         newBooking.setRoom(room);
 
         when(bookingRepository.findByRoomId(1L)).thenReturn(List.of(existingBooking));
 
-        String result = bookingService.createBooking(newBooking);
-
-        assertEquals("Rummet är redan uppbokat under denna period", result);
+        boolean result = bookingService.createBooking(newBooking);
+        assertFalse(result);
     }
 
-    // Testar findAvailableRooms
     @Test
-    void findAvailableRooms() {
-        Room room1 = new Room();
-        room1.setId(1L);
-        room1.setBeds(2);
-        room1.setExtraBeds(0);
+    void findAvailableRoomsNoOverlap() {
+        Room room = new Room();
+        room.setId(1L);
+        room.setBeds(2);
+        room.setExtraBeds(1);
 
-        Room room2 = new Room();
-        room2.setId(2L);
-        room2.setBeds(1);
-        room2.setExtraBeds(1);
+        Booking existingBooking = new Booking();
+        existingBooking.setStartDate(date("2025-05-01"));
+        existingBooking.setEndDate(date("2025-05-05"));
+        existingBooking.setRoom(room);
 
-        Booking booking1 = new Booking();
-        booking1.setStartDate(date("2025-06-05"));
-        booking1.setEndDate(date("2025-06-10"));
-        booking1.setRoom(room1);
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+        when(bookingRepository.findByRoomId(1L)).thenReturn(List.of(existingBooking));
 
-        when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
-        when(bookingRepository.findByRoomId(1L)).thenReturn(List.of(booking1));
-        when(bookingRepository.findByRoomId(2L)).thenReturn(Collections.emptyList());
+        List<Room> available = bookingService.findAvailableRooms(
+                date("2025-05-10"),
+                date("2025-05-15"),
+                2
+        );
 
-        Date searchStart = date("2025-06-01");
-        Date searchEnd = date("2025-06-04");
-        int guests = 2;
-
-        List<Room> availableRooms = bookingService.findAvailableRooms(searchStart, searchEnd, guests);
-
-        // Båda rummen ska vara tillgängliga — inga bokningskonflikter och kapacitet ok
-        assertTrue(availableRooms.contains(room1));
-        assertTrue(availableRooms.contains(room2));
+        assertEquals(1, available.size());
+        assertEquals(1L, available.getFirst().getId());
     }
 
-    // Hjälpmetod för att skapa Date-objekt från yyyy-MM-dd
+    @Test
+    void findAvailibleRoomsOverlap() {
+        Room room = new Room();
+        room.setId(2L);
+        room.setBeds(2);
+        room.setExtraBeds(0);
+
+        Booking overlappingBooking = new Booking();
+        overlappingBooking.setStartDate(date("2025-05-10"));
+        overlappingBooking.setEndDate(date("2025-05-20"));
+        overlappingBooking.setRoom(room);
+
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+        when(bookingRepository.findByRoomId(2L)).thenReturn(List.of(overlappingBooking));
+
+        List<Room> available = bookingService.findAvailableRooms(
+                date("2025-05-15"),
+                date("2025-05-25"),
+                2
+        );
+
+        assertTrue(available.isEmpty());
+    }
+
     private Date date(String yyyyMMdd) {
-        Calendar cal = Calendar.getInstance();
-        String[] parts = yyyyMMdd.split("-");
-        cal.set(Calendar.YEAR, Integer.parseInt(parts[0]));
-        cal.set(Calendar.MONTH, Integer.parseInt(parts[1]) - 1);
-        cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(parts[2]));
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
+        return java.sql.Date.valueOf(yyyyMMdd);
+
     }
 }
