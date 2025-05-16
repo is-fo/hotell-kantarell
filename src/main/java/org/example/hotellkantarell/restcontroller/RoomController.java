@@ -39,6 +39,7 @@ public class RoomController {
     public String deleteById(@PathVariable Long id) {
         Optional<Room> room = roomRepository.findById(id);
         if (room.isPresent()) {
+            roomRepository.delete(room.get());
             return "Tog bort: " + room.get();
         } else {
             return "Kunde inte hitta ett rum med id: " + id;
