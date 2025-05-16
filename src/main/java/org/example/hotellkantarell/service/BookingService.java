@@ -1,14 +1,12 @@
 package org.example.hotellkantarell.service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
+import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
-import org.example.hotellkantarell.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +20,10 @@ public class BookingService {
     public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
+    }
+
+    public List<Booking> findBookingByUser(User user) {
+        return bookingRepository.findByUserId(user.getId());
     }
 
     public boolean createBooking(Booking booking) {

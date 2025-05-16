@@ -29,24 +29,6 @@ public class UserController {
         return userService.register(registerRequest) != null ? "redirect:/login" : "redirect:/register";
     }
 
-    @GetMapping("/profile")
-    public String showProfile(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/login";
-        }
-        return "profile";
-    }
-
-    @PostMapping("/profile/user/delete")
-    public String deleteUser(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/login";
-        }
-        return userService.deleteUser(user) ? "redirect:/register" : "redirect:/profile";
-    }
-
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
