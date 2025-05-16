@@ -1,7 +1,9 @@
 package org.example.hotellkantarell.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
+import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +26,25 @@ public class UserController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute RegisterRequest registerRequest) {
-        return userService.register(registerRequest) ? "redirect:/login" : "redirect:/register";
+        return userService.register(registerRequest) != null ? "redirect:/login" : "redirect:/register";
+    }
+
+    @GetMapping("/profile")
+    public String showProfile(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        return "profile";
+    }
+
+    @PostMapping("/profile/user/delete")
+    public String deleteUser(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        return userService.deleteUser(user) ? "redirect:/register" : "redirect:/profile";
     }
 
     @GetMapping("/login")
@@ -33,8 +53,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute LoginRequest loginRequest) {
-        return userService.login(loginRequest) ? "start" : "redirect:/login";
+    public String loginUser(@ModelAttribute LoginRequest loginRequest, HttpSession session) {
+        User user = userService.login(loginRequest);
+        if (user != null) {
+            session.setAttribute("user", user);
+            return "start";
+        }
+        return "redirect:/login";
     }
 
 }
