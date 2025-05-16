@@ -5,7 +5,7 @@
     <title>Start</title>
 </head>
 <body>
-  <p>Hellllllo World åäö</p>
+  <p>Välkommen till Hotell Kantarell!</p>
   <form>
   <label for="start">Startdatum:</label>
   <input type="date" id="start" name="start">
@@ -33,6 +33,12 @@
 
       <button type="submit">Skicka</button>
   </form>
+  <div th:if="${results != null}">
+      <h2>Tillgängliga rum</h2>
+      <ul>
+          <li th:each="item : ${results}" th:text="Rum id ${item.id}, Storlek ${item.area}"></li>
+      </ul>
+  </div>
 
 </body>
 </html>
