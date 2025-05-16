@@ -1,16 +1,17 @@
 package org.example.hotellkantarell.restcontroller;
 
 
+import org.springframework.ui.Model;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.service.BookingService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/bookings")
@@ -44,12 +45,6 @@ public class BookingController {
         return bookingService.deleteBooking(id);
     }
 
-    @GetMapping("/available")
-    public List<Room> findAvailableRooms(
-            @RequestParam Date start,
-            @RequestParam Date end,
-            @RequestParam int guests
-    ) {
-        return bookingService.findAvailableRooms(start, end, guests);
-    }
+
+
 }
