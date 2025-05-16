@@ -18,26 +18,22 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String register(RegisterRequest request) {
-        if (userRepository.findByEmail(request.email()) != null) {
-            return "Finns redan en användare med email: " + request.email();
+    public boolean register(String name, String email, String rawPassword) {
+        if (userRepository.findByEmail(email) != null) {
+            return false;
         }
         userRepository.save(new User(
-                request.name(),
-                request.email(),
-                passwordEncoder.encode(request.rawPassword())
+                name,
+                email,
+                passwordEncoder.encode(rawPassword)
         ));
 
-        return "Registrerade användare: " + request.name();
+        return true;
     }
 
-    public String login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email());
-        if (user == null || !passwordEncoder.matches(request.rawPassword(), user.getPasswordHash())) {
-            return "Fel användarnamn eller lösenord";
-        }
-
-        return "Du är nu inloggad som: " + user.getName();
+    public boolean login(String email, String rawPassword) {
+        User user = userRepository.findByEmail(email);
+        return user != null && passwordEncoder.matches(rawPassword, user.getPasswordHash());
     }
 
 }

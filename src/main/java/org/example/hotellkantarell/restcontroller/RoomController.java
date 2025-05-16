@@ -1,4 +1,4 @@
-package org.example.hotellkantarell.controller;
+package org.example.hotellkantarell.restcontroller;
 
 
 import org.example.hotellkantarell.model.Room;
