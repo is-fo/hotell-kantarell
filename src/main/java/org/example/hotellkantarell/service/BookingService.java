@@ -51,6 +51,10 @@ public class BookingService {
 
         return allRooms.stream()
                 .filter(room -> {
+                    int capacity = room.getBeds() + room.getExtraBeds();
+                    return guests <= capacity;
+                })
+                .filter(room -> {
                     List<Booking> bookings = bookingRepository.findByRoomId(room.getId());
                     for (Booking booking : bookings) {
                         if (startDate.before(booking.getEndDate()) && endDate.after(booking.getStartDate())) {
@@ -58,10 +62,6 @@ public class BookingService {
                         }
                     }
                     return true;
-                })
-                .filter(room -> {
-                    int capacity = room.getBeds() + room.getExtraBeds();
-                    return guests <= capacity;
                 })
                 .collect(Collectors.toList());
     }
