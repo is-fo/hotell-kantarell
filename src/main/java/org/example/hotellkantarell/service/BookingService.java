@@ -31,14 +31,7 @@ public class BookingService {
             return "Startdatumet måste vara före slutdatumet";
         }
 
-        boolean isDoubleBooked = bookingRepository
-                .findByRoomId(booking.getRoom().getId())
-                .stream()
-                .anyMatch(existing ->
-                        booking.getStartDate().before(existing.getEndDate()) &&
-                                booking.getEndDate().after(existing.getStartDate()));
-
-        if (isDoubleBooked) {
+        if (isRoomDoubleBooked(booking, null)) {
             return "Rummet är redan uppbokat under denna period";
         }
 
@@ -72,15 +65,7 @@ public class BookingService {
             return "Bokning med ID " + id + " finns inte.";
         }
 
-        boolean isDoubleBooked = bookingRepository
-                .findByRoomId(booking.getRoom().getId())
-                .stream()
-                .filter(b -> !b.getId().equals(id))
-                .anyMatch(existingBooking ->
-                        booking.getStartDate().before(existingBooking.getEndDate()) &&
-                                booking.getEndDate().after(existingBooking.getStartDate()));
-
-        if (isDoubleBooked) {
+        if (isRoomDoubleBooked(booking, id)) {
             return "Det finns redan en bokning för detta rum under valt datumintervall.";
         }
 
@@ -98,5 +83,12 @@ public class BookingService {
         return "Bokning har tagits bort.";
     }
 
-
+    private boolean isRoomDoubleBooked(Booking booking, Long excludeBookingId) {
+        return bookingRepository.findByRoomId(booking.getRoom().getId())
+                .stream()
+                .filter(existing -> excludeBookingId == null || !existing.getId().equals(excludeBookingId))
+                .anyMatch(existing ->
+                        booking.getStartDate().before(existing.getEndDate()) &&
+                                booking.getEndDate().after(existing.getStartDate()));
+    }
 }
