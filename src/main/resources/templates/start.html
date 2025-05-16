@@ -39,7 +39,18 @@
   <div th:if="${results != null}">
       <h2>Tillgängliga rum</h2>
       <ul>
-          <li th:each="item : ${results}" th:text="|Rum id ${item.id}, Storlek ${item.area}|"></li>
+          <li th:each="item : ${results}">
+              <form th:action="@{/book}" method="post">
+                  <!-- Visa info till användaren -->
+                  Rum id <span th:text="${item.id}">1</span>, Storlek <span th:text="${item.area}">20</span> m²
+
+                  <!-- Skickar med data till servern -->
+                  <input type="hidden" name="room.id" th:value="${item.id}" />
+                  <input type="hidden" name="start" th:value="${#dates.format(start, 'yyyy-MM-dd')}" />
+                  <input type="hidden" name="end" th:value="${#dates.format(end, 'yyyy-MM-dd')}" />
+                  <button type="submit">Boka</button>
+              </form>
+          </li>
       </ul>
   </div>
   <div th:if="${error}">
