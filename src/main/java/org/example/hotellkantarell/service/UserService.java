@@ -18,22 +18,22 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public boolean register(String name, String email, String rawPassword) {
-        if (userRepository.findByEmail(email) != null) {
+    public boolean register(RegisterRequest registerRequest) {
+        if (userRepository.findByEmail(registerRequest.email()) != null) {
             return false;
         }
         userRepository.save(new User(
-                name,
-                email,
-                passwordEncoder.encode(rawPassword)
+                registerRequest.name(),
+                registerRequest.email(),
+                passwordEncoder.encode(registerRequest.rawPassword())
         ));
 
         return true;
     }
 
-    public boolean login(String email, String rawPassword) {
-        User user = userRepository.findByEmail(email);
-        return user != null && passwordEncoder.matches(rawPassword, user.getPasswordHash());
+    public boolean login(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.email());
+        return user != null && passwordEncoder.matches(loginRequest.rawPassword(), user.getPasswordHash());
     }
 
 }

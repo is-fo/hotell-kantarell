@@ -5,8 +5,8 @@ import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UserController {
@@ -23,12 +23,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(
-            @RequestParam String email,
-            @RequestParam String rawPassword,
-            @RequestParam String name
-    ) {
-        return userService.register(name, email, rawPassword) ? "redirect:/login" : "redirect:/register";
+    public String registerUser(@ModelAttribute RegisterRequest registerRequest) {
+        return userService.register(registerRequest) ? "redirect:/login" : "redirect:/register";
     }
 
     @GetMapping("/login")
@@ -37,8 +33,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestParam String email, @RequestParam String rawPassword) {
-        return userService.login(email, rawPassword) ? "start" : "redirect:/login";
+    public String loginUser(@ModelAttribute LoginRequest loginRequest) {
+        return userService.login(loginRequest) ? "start" : "redirect:/login";
     }
 
 }
