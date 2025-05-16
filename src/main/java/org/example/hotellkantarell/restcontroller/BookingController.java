@@ -29,19 +29,21 @@ public class BookingController {
         return bookingRepository.findAll();
     }
 
+
+    // TODO FIXA BÄTTRE SVAR
     @PostMapping("/booking")
     public String addBooking(@RequestBody Booking booking) {
-        return bookingService.createBooking(booking);
+        return bookingService.createBooking(booking) ? "Success" : "Fail";
     }
 
     @PatchMapping("/booking/{id}")
     public String editBooking(@RequestBody Booking booking, @PathVariable Long id) {
-        return bookingService.updateBooking(id, booking);
+        return bookingService.updateBooking(id, booking) ? "Success" : "Fail";
     }
 
     @DeleteMapping("/booking/{id}")
     public String deleteBooking(@PathVariable long id) {
-        return bookingService.deleteBooking(id);
+        return bookingService.deleteBooking(id) ? "Success" : "Fail";
     }
 
     @GetMapping("/available")

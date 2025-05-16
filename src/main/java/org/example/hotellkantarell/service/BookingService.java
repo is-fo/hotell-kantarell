@@ -26,17 +26,17 @@ public class BookingService {
         this.bookingRepository = bookingRepository;
     }
 
-    public String createBooking(Booking booking) {
+    public boolean createBooking(Booking booking) {
         if (booking.getStartDate().after(booking.getEndDate())) {
-            return "Startdatumet måste vara före slutdatumet";
+            return false;
         }
 
         if (isRoomDoubleBooked(booking, null)) {
-            return "Rummet är redan uppbokat under denna period";
+            return false;
         }
 
         bookingRepository.save(booking);
-        return "Bokningen är nu gjord";
+        return true;
     }
 
     public List<Room> findAvailableRooms(Date startDate, Date endDate, int guests) {
@@ -59,34 +59,34 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    public String updateBooking(Long id, Booking booking) {
+    public boolean updateBooking(Long id, Booking booking) {
         Booking existing = bookingRepository.findById(id).orElse(null);
         if (existing == null) {
-            return "Bokning med ID " + id + " finns inte.";
+            return false;
         }
 
         if (isRoomDoubleBooked(booking, id)) {
-            return "Det finns redan en bokning för detta rum under valt datumintervall.";
+            return false;
         }
 
         booking.setId(id);
         bookingRepository.save(booking);
-        return "Bokningen har uppdaterats.";
+        return true;
     }
 
-    public String deleteBooking(Long id) {
+    public boolean deleteBooking(Long id) {
         if (!bookingRepository.existsById(id)) {
-            return "Bokning finns inte.";
+            return false;
         }
 
         bookingRepository.deleteById(id);
-        return "Bokning har tagits bort.";
+        return true;
     }
 
     private boolean isRoomDoubleBooked(Booking booking, Long excludeBookingId) {
         return bookingRepository.findByRoomId(booking.getRoom().getId())
                 .stream()
-                .filter(existing -> excludeBookingId == null || !existing.getId().equals(excludeBookingId))
+                .filter(existing -> !existing.getId().equals(excludeBookingId))
                 .anyMatch(existing ->
                         booking.getStartDate().before(existing.getEndDate()) &&
                                 booking.getEndDate().after(existing.getStartDate()));
