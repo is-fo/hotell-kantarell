@@ -2,6 +2,7 @@ package org.example.hotellkantarell.controller;
 
 import jakarta.servlet.http.HttpSession;
 import org.example.hotellkantarell.model.Booking;
+import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
@@ -30,6 +31,8 @@ public class ProfileController {
         }
         List<Booking> bookings = bookingService.findBookingByUser(user);
         model.addAttribute("bookings", bookings);
+        List<Room> rooms = bookings.stream().map(Booking::getRoom).toList();
+        model.addAttribute("rooms", rooms);
 
         return "profile";
     }

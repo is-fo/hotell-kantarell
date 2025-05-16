@@ -10,6 +10,21 @@
 <form action="/profile/user/delete" method="POST" >
   <button type="submit">Delete Account</button>
 </form>
+<br>
+<div th:if="${bookings != null}">
+    <h2>Dina bokningar</h2>
+    <ul>
+        <li th:each="item : ${bookings}">
+            <form th:action="@{/profile}" method="get">
+                Rum: <span th:text="|${item.room.beds} Sängar, ${item.room.extraBeds} extrasängar|"></span>,
+                Incheckning: <span th:text="${item.startDate}"></span>,
+                Utcheckning: <span th:text="${item.endDate}"></span>
+                <button type="submit">Ta bort</button>
+            </form>
+        </li>
+    </ul>
+</div>
+
 
 </body>
 </html>

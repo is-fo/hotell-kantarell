@@ -47,8 +47,8 @@ public class BookingPageController {
     }
 
     @PostMapping("/book")
-    public String bookRoom(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
+    public String bookRoom(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
+                           @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
                            @RequestParam("room.id") Long roomId, HttpSession session, Model model)
     {
         User user = (User) session.getAttribute("user");
