@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpSession;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
-import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
 import org.example.hotellkantarell.service.BookingService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,12 +20,10 @@ import java.util.Optional;
 @Controller
 public class BookingPageController {
     final BookingService bookingService;
-    final BookingRepository bookingRepository;
     private final RoomRepository roomRepository;
 
-    public BookingPageController(BookingService bookingService, BookingRepository bookingRepository, RoomRepository roomRepository) {
+    public BookingPageController(BookingService bookingService, RoomRepository roomRepository) {
         this.bookingService = bookingService;
-        this.bookingRepository = bookingRepository;
         this.roomRepository = roomRepository;
     }
 
