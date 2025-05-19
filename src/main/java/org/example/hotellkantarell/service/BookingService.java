@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +28,9 @@ public class BookingService {
     }
 
     public boolean createBooking(Booking booking) {
-        if (booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
+        if (
+                booking.getStartDate().after(booking.getEndDate())
+                || isRoomDoubleBooked(booking)) {
             return false;
         }
 
@@ -57,7 +60,10 @@ public class BookingService {
 
     public boolean updateBooking(Long id, Booking booking) {
         Booking existing = bookingRepository.findById(id).orElse(null);
-        if (existing == null || isRoomDoubleBooked(booking)) {
+        if (
+                existing == null ||
+                booking.getStartDate().after(booking.getEndDate()) ||
+                isRoomDoubleBooked(booking)) {
             return false;
         }
 
@@ -82,5 +88,9 @@ public class BookingService {
                 .anyMatch(existing ->
                         booking.getStartDate().before(existing.getEndDate()) &&
                                 booking.getEndDate().after(existing.getStartDate()));
+    }
+
+    public Optional<Booking> findById(Long id) {
+        return bookingRepository.findById(id);
     }
 }

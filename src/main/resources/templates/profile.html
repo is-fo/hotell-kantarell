@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
@@ -15,6 +15,13 @@
     </form>
 </div>
 
+<div id="error-popup" th:if="${error}">
+    <span th:text="${error}"></span>
+    <button id="close-error">×</button>
+</div>
+<form action="/profile/user/delete" method="POST" >
+  <button type="submit">Delete Account</button>
+</form>
 <br>
 <div th:if="${bookings != null}">
     <h2>Dina bokningar</h2>
@@ -26,6 +33,16 @@
                 Utcheckning: <span th:text="${item.endDate}"></span>
                 <button type="submit">Ta bort</button>
             </form>
+
+            <button type="button" th:onclick="'toggleForm(' + ${item.id} + ')'">Uppdatera</button>
+
+            <form th:action="@{/profile/booking/update}" method="post"
+                  th:id="'update-form-' + ${item.id}" style="display:none">
+                <input type="hidden" name="bookingId" th:value="${item.id}" />
+                Ny incheckning: <input type="date" name="start" th:value="${#dates.format(item.startDate, 'yyyy-MM-dd')}" />
+                Ny utcheckning: <input type="date" name="end" th:value="${#dates.format(item.endDate, 'yyyy-MM-dd')}" />
+                <button type="submit">Spara</button>
+            </form>
         </li>
     </ul>
 </div>
@@ -35,6 +52,16 @@
     <button type="submit">Radera konto</button>
 </form>
 
+<script>
+    function toggleForm(id) {
+        const form = document.getElementById("update-form-" + id);
+        if (form.style.display === "none") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+    }
+</script>
 
 </body>
 </html>
