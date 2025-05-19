@@ -5,7 +5,6 @@ import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
-import org.example.hotellkantarell.util.DateUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
