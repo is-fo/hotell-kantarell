@@ -6,12 +6,14 @@ import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -57,8 +59,32 @@ public class ProfileController {
                 !user.getName().equals(booking.getUser().getName()) ||
                 !bookingService.deleteBooking(booking.getId())
         ) {
-            model.addAttribute("booking-error-delete", "Kunde inte ta bort bokningen.");
+            model.addAttribute("error", "Kunde inte ta bort bokningen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
+        }
+
+        return "redirect:/profile";
+    }
+
+    @PostMapping("profile/booking/update")
+    public String updateBooking(HttpSession session,
+                                @RequestParam Long bookingId,
+                                @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
+                                @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
+                                Model model) {
+        Booking booking = bookingService.findById(bookingId).orElse(null);
+        User user = (User) session.getAttribute("user");
+        if (booking == null || user == null || !user.getName().equals(booking.getUser().getName())) {
+            model.addAttribute("error", "Kunde inte uppdatera bokningen.");
+            System.err.println("Kunde inte uppdatera bokning med id: " + bookingId);
+            return "redirect:/profile";
+        }
+        booking.setStartDate(start);
+        booking.setEndDate(end);
+
+        if (!bookingService.updateBooking(booking.getId(), booking)) {
+            model.addAttribute("error", "Kunde inte uppdatera bokningen.");
+            System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId);
         }
 
         return "redirect:/profile";

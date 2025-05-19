@@ -58,7 +58,7 @@ public class BookingService {
 
     public boolean updateBooking(Long id, Booking booking) {
         Booking existing = bookingRepository.findById(id).orElse(null);
-        if (existing == null || isRoomDoubleBooked(booking)) {
+        if (existing == null || booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
             return false;
         }
 
