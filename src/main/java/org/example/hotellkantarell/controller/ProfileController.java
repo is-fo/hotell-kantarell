@@ -32,10 +32,7 @@ public class ProfileController {
         if (user == null) {
             return "redirect:/login";
         }
-        List<Booking> bookings = bookingService.findBookingByUser(user);
-        model.addAttribute("bookings", bookings);
-        List<Room> rooms = bookings.stream().map(Booking::getRoom).toList();
-        model.addAttribute("rooms", rooms);
+        populateProfile(model, user);
 
         return "profile";
     }
@@ -61,6 +58,8 @@ public class ProfileController {
         ) {
             model.addAttribute("error", "Kunde inte ta bort bokningen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
+            populateProfile(model, user);
+            return "profile";
         }
 
         return "redirect:/profile";
@@ -77,16 +76,33 @@ public class ProfileController {
         if (booking == null || user == null || !user.getName().equals(booking.getUser().getName())) {
             model.addAttribute("error", "Kunde inte uppdatera bokningen.");
             System.err.println("Kunde inte uppdatera bokning med id: " + bookingId);
-            return "redirect:/profile";
+            populateProfile(model, user);
+            return "profile";
         }
+
+        if (start.after(end)) {
+            model.addAttribute("error", "Startdatum måste vara före slutdatum.");
+            populateProfile(model, user);
+            return "profile";
+        }
+
         booking.setStartDate(start);
         booking.setEndDate(end);
 
         if (!bookingService.updateBooking(booking.getId(), booking)) {
             model.addAttribute("error", "Kunde inte uppdatera bokningen.");
             System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId);
+            populateProfile(model, user);
+            return "profile";
         }
 
         return "redirect:/profile";
+    }
+
+    private void populateProfile(Model model, User user) {
+        List<Booking> bookings = bookingService.findBookingByUser(user);
+        model.addAttribute("bookings", bookings);
+        List<Room> rooms = bookings.stream().map(Booking::getRoom).toList();
+        model.addAttribute("rooms", rooms);
     }
 }
