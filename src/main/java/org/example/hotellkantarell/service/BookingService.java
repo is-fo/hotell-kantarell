@@ -5,6 +5,7 @@ import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
+import org.example.hotellkantarell.util.DateUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -28,7 +29,9 @@ public class BookingService {
     }
 
     public boolean createBooking(Booking booking) {
-        if (booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
+        if (
+                booking.getStartDate().after(booking.getEndDate())
+                || isRoomDoubleBooked(booking)) {
             return false;
         }
 
@@ -58,7 +61,10 @@ public class BookingService {
 
     public boolean updateBooking(Long id, Booking booking) {
         Booking existing = bookingRepository.findById(id).orElse(null);
-        if (existing == null || booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
+        if (
+                existing == null ||
+                booking.getStartDate().after(booking.getEndDate()) ||
+                isRoomDoubleBooked(booking)) {
             return false;
         }
 

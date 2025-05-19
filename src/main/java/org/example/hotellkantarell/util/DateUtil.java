@@ -7,7 +7,7 @@ public class DateUtil {
     public static Date nDaysInFuture(Integer days) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.add(Calendar.DATE, 3);
+        calendar.add(Calendar.DATE, days);
 
         return calendar.getTime();
     }
