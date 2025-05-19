@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -44,5 +45,22 @@ public class ProfileController {
             return "redirect:/login";
         }
         return userService.deleteUser(user) ? "redirect:/register" : "redirect:/profile";
+    }
+
+    @PostMapping("/profile/booking/delete")
+    public String deleteBooking(HttpSession session, @RequestParam Long bookingId, Model model) {
+        Booking booking = bookingService.findById(bookingId).orElse(null);
+        User user = (User) session.getAttribute("user");
+        if (
+                booking == null ||
+                user == null ||
+                !user.getName().equals(booking.getUser().getName()) ||
+                !bookingService.deleteBooking(booking.getId())
+        ) {
+            model.addAttribute("booking-error-delete", "Kunde inte ta bort bokningen.");
+            System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
+        }
+
+        return "redirect:/profile";
     }
 }

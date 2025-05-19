@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,5 +83,9 @@ public class BookingService {
                 .anyMatch(existing ->
                         booking.getStartDate().before(existing.getEndDate()) &&
                                 booking.getEndDate().after(existing.getStartDate()));
+    }
+
+    public Optional<Booking> findById(Long id) {
+        return bookingRepository.findById(id);
     }
 }

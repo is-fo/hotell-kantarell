@@ -15,7 +15,8 @@
     <h2>Dina bokningar</h2>
     <ul>
         <li th:each="item : ${bookings}">
-            <form th:action="@{/profile}" method="get">
+            <form th:action="@{/profile/booking/delete}" method="post">
+                <input type="hidden" name="bookingId" th:value="${item.id}" />
                 Rum: <span th:text="|${item.room.beds} Sängar, ${item.room.extraBeds} extrasängar|"></span>,
                 Incheckning: <span th:text="${item.startDate}"></span>,
                 Utcheckning: <span th:text="${item.endDate}"></span>
