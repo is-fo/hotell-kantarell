@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
 </head>
 <body>
+<div>
+    <h2 th:text="${userDetailsLabel}"></h2>
+    <span th:text="${nameLabel + nameValue}"></span>
+    <br>
+    <span th:text="${emailLabel + emailValue}"></span>
+    <form th:action="@{/editprofile}" method="get">
+        <button type="submit">Ändra uppgifter</button>
+    </form>
+</div>
 
-
-<form action="/profile/user/delete" method="POST" >
-  <button type="submit">Delete Account</button>
-</form>
 <br>
 <div th:if="${bookings != null}">
     <h2>Dina bokningar</h2>
@@ -24,6 +29,11 @@
         </li>
     </ul>
 </div>
+<br>
+<br>
+<form action="/profile/user/delete" method="POST" >
+    <button type="submit">Radera konto</button>
+</form>
 
 
 </body>

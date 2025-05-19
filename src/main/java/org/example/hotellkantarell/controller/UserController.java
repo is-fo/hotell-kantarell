@@ -4,19 +4,23 @@ import jakarta.servlet.http.HttpSession;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.model.User;
+import org.example.hotellkantarell.repository.UserRepository;
 import org.example.hotellkantarell.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.ui.Model;
 
 @Controller
 public class UserController {
 
     final UserService userService;
+    private final UserRepository userRepository;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/register")
@@ -43,5 +47,9 @@ public class UserController {
         }
         return "redirect:/login";
     }
+
+
+
+
 
 }

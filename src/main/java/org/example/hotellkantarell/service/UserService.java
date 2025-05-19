@@ -1,5 +1,6 @@
 package org.example.hotellkantarell.service;
 
+import jakarta.servlet.http.HttpSession;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.model.Booking;
@@ -45,6 +46,7 @@ public class UserService {
         return null;
     }
 
+
     public boolean deleteUser(User user) {
         Optional<User> exists = userRepository.findById(user.getId());
         List<Booking> bookings = bookingRepository.findByUserId(user.getId());
@@ -54,6 +56,18 @@ public class UserService {
 
         userRepository.delete(exists.get());
         return true;
+    }
+
+    public User editProfile(User user, RegisterRequest request) {
+        user.setName(request.name());
+        user.setEmail(request.email());
+
+        if (request.rawPassword() != null && !request.rawPassword().isBlank()) {
+            String hashedPassword = passwordEncoder.encode(request.rawPassword());
+            user.setPasswordHash(hashedPassword);
+        }
+
+        return userRepository.save(user);
     }
 
 }

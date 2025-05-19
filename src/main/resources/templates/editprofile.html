@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Profile</title>
+</head>
+<body>
+<div><form th:action="@{/editprofile}" method="post">
+    <h2 th:text="${userDetails}">Dina uppgifter</h2>
+
+    <label>
+        <span th:text="${nameLabel}">Namn: </span>
+        <input type="text" name="name" th:value="${nameValue}" required>
+    </label>
+    <br>
+
+    <label>
+        <span th:text="${emailLabel}">Mailadress: </span>
+        <input type="text" name="email" th:value="${emailValue}" required>
+    </label>
+    <br>
+    <label>
+        Nytt lösenord (valfritt):
+        <input type="password" name="rawPassword">
+    </label>
+    <br>
+
+    <button type="submit">Ändra uppgifter</button>
+</form>
+</div>
+
+</body>
+</html>
