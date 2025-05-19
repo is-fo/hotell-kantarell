@@ -66,7 +66,7 @@ public class UserService {
         return true;
     }
 
-    public User editProfile(User user, @Valid RegisterRequest request) {
+    public User editProfile(User user, RegisterRequest request) {
         if (request.name() != null) {
             user.setName(request.name());
         }
