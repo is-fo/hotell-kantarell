@@ -1,6 +1,7 @@
 package org.example.hotellkantarell.controller;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
@@ -9,6 +10,7 @@ import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +48,7 @@ public class ProfileController {
         return "profile";
     }
 
-    @GetMapping("/editprofile")
+    @GetMapping("/profile/user/update")
     public String showEditProfile(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
@@ -59,11 +61,12 @@ public class ProfileController {
         model.addAttribute("nameValue", user.getName());
         model.addAttribute("emailValue", user.getEmail());
 
-        return "redirect:/editprofile";
+        return "editprofile";
     }
 
-    @PostMapping("/editprofile")
-    public String editProfile(@ModelAttribute RegisterRequest registerRequest, HttpSession session) {
+    @PostMapping("/profile/user/update")
+    public String editProfile(@ModelAttribute @Valid RegisterRequest registerRequest, HttpSession session) {
+
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
@@ -83,6 +86,5 @@ public class ProfileController {
         }
         return userService.deleteUser(user) ? "redirect:/register" : "redirect:/profile";
     }
-
 
 }

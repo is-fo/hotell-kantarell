@@ -10,7 +10,7 @@
     <span th:text="${nameLabel + nameValue}"></span>
     <br>
     <span th:text="${emailLabel + emailValue}"></span>
-    <form th:action="@{/editprofile}" method="get">
+    <form th:action="@{/profile/user/update}" method="get">
         <button type="submit">Ändra uppgifter</button>
     </form>
 </div>
