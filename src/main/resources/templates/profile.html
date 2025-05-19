@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/script/script.js" defer></script>
 </head>
 <body>
 <div>
@@ -34,7 +36,10 @@
                 Rum: <span th:text="|${item.room.beds} Sängar, ${item.room.extraBeds} extrasängar|"></span>,
                 Incheckning: <span th:text="${item.startDate}"></span>,
                 Utcheckning: <span th:text="${item.endDate}"></span>
-                <button type="submit">Ta bort</button>
+            </form>
+            <form th:action="@{/profile/booking/delete}" method="post">
+                <input type="hidden" name="bookingId" th:value="${item.id}">
+                <button type="submit">TA BORT BOKNING</button>
             </form>
 
             <button type="button" th:onclick="'toggleForm(' + ${item.id} + ')'">Uppdatera</button>
@@ -54,17 +59,6 @@
 <form action="/profile/user/delete" method="POST" >
     <button type="submit">Radera konto</button>
 </form>
-
-<script>
-    function toggleForm(id) {
-        const form = document.getElementById("update-form-" + id);
-        if (form.style.display === "none") {
-            form.style.display = "block";
-        } else {
-            form.style.display = "none";
-        }
-    }
-</script>
 
 </body>
 </html>

@@ -16,7 +16,7 @@ public class UserController {
 
     final UserService userService;
 
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
