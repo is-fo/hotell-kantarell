@@ -59,7 +59,7 @@ public class ProfileController {
         model.addAttribute("nameValue", user.getName());
         model.addAttribute("emailValue", user.getEmail());
 
-        return "redirect:/editprofile";
+        return "editprofile";
     }
 
     @PostMapping("/editprofile")
