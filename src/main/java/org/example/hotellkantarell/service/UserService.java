@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import org.example.hotellkantarell.dto.EditPasswordRequest;
+import org.example.hotellkantarell.dto.EditProfileRequest;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.model.Booking;
@@ -13,6 +15,7 @@ import org.example.hotellkantarell.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +69,7 @@ public class UserService {
         return true;
     }
 
-    public User editProfile(User user, RegisterRequest request) {
+    public User editProfile(User user, @Valid @ModelAttribute EditProfileRequest request) {
         if (request.name() != null) {
             user.setName(request.name());
         }
@@ -74,11 +77,14 @@ public class UserService {
         if (request.email() != null) {
             user.setEmail(request.email());
         }
-        if (request.rawPassword() != null && !request.rawPassword().isBlank()) {
-            String hashedPassword = passwordEncoder.encode(request.rawPassword());
-            user.setPasswordHash(hashedPassword);
-        }
 
+        return userRepository.save(user);
+    }
+
+    public User editPassword(User user, @Valid @ModelAttribute EditPasswordRequest request) {
+        if(request.rawPassword() != null) {
+            user.setPasswordHash(passwordEncoder.encode(request.rawPassword()));
+        }
         return userRepository.save(user);
     }
 

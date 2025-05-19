@@ -2,7 +2,8 @@ package org.example.hotellkantarell.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.example.hotellkantarell.dto.RegisterRequest;
+import org.example.hotellkantarell.dto.EditPasswordRequest;
+import org.example.hotellkantarell.dto.EditProfileRequest;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
@@ -66,17 +67,46 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/user/update")
-    public String editProfile(@ModelAttribute @Valid RegisterRequest registerRequest, HttpSession session) {
+    public String editProfile(@ModelAttribute @Valid EditProfileRequest editProfileRequest, BindingResult result, HttpSession session, Model model) {
 
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
         }
+        if (result.hasErrors()) {
+            model.addAttribute("userDetails", "Ändra dina uppgifter");
+            model.addAttribute("nameLabel", "Namn: ");
+            model.addAttribute("emailLabel", "Mailadress: ");
+            return "editprofile";
+        }
 
-        User updated = userService.editProfile(currentUser, registerRequest);
+        User updated = userService.editProfile(currentUser, editProfileRequest);
         session.setAttribute("user", updated);
 
         return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/user/updatepassword")
+    public String updatePassword(@ModelAttribute @Valid EditPasswordRequest editPasswordRequest, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        User updated = userService.editPassword(currentUser, editPasswordRequest);
+        session.setAttribute("user", updated);
+
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/profile/user/updatepassword")
+    public String showUpdatePasswordForm(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        return "editpassword";
     }
 
     @PostMapping("/profile/user/delete")

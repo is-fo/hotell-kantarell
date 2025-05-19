@@ -13,6 +13,9 @@
     <form th:action="@{/profile/user/update}" method="get">
         <button type="submit">Ändra uppgifter</button>
     </form>
+    <form th:action="@{/profile/user/updatepassword}" method="get">
+        <button type="submit">Ändra lösenord</button>
+    </form>
 </div>
 
 <div id="error-popup" th:if="${error}">
