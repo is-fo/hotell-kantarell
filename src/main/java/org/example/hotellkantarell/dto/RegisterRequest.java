@@ -11,10 +11,10 @@ public record RegisterRequest(
         @Pattern(regexp = "^[a-zA-ZåÅäÄöÖ '\\-]+$", message = "Ogiltigt namn")
         String name,
 
-        @Email(message = "Invalid email format")
+        @Email(message = "Felaktigt format på e-postadressen")
         String email,
 
-        @Size(min = 6, message = "Password must be atleast 6 characters")
+        @Size(min = 6, message = "Lösenordet måste innehålla minst 6 tecken")
         String rawPassword
 ) {
 }
