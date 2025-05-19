@@ -6,6 +6,7 @@ import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
+import org.example.hotellkantarell.util.DateUtil;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -74,14 +75,20 @@ public class ProfileController {
         Booking booking = bookingService.findById(bookingId).orElse(null);
         User user = (User) session.getAttribute("user");
         if (booking == null || user == null || !user.getName().equals(booking.getUser().getName())) {
-            model.addAttribute("error", "Kunde inte uppdatera bokningen.");
-            System.err.println("Kunde inte uppdatera bokning med id: " + bookingId);
+            model.addAttribute("error", "Något gick snett. Ladda om sidan.");
+            System.err.println("Kaffe i servern: " + bookingId);
             populateProfile(model, user);
             return "profile";
         }
 
         if (start.after(end)) {
             model.addAttribute("error", "Startdatum måste vara före slutdatum.");
+            populateProfile(model, user);
+            return "profile";
+        }
+
+        if (start.before(DateUtil.nDaysInFuture(-1))) {
+            model.addAttribute("error", "Startdatum måste vara idag eller i framtiden");
             populateProfile(model, user);
             return "profile";
         }
