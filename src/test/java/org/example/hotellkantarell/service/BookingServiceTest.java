@@ -48,8 +48,6 @@ class BookingServiceTest {
         newBooking.setEndDate(date("2025-05-25"));
         newBooking.setRoom(room);
 
-        when(bookingRepository.findByRoomId(1L)).thenReturn(List.of(existingBooking));
-
         boolean result = bookingService.createBooking(newBooking);
         assertFalse(result);
     }

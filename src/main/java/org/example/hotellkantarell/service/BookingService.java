@@ -30,19 +30,19 @@ public class BookingService {
         return bookingRepository.findByUserId(user.getId());
     }
 
-    private Date setTime(Date date, int hour, int minute) {
+    private Date setTime(Date date, int hour) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
 
     public boolean createBooking(Booking booking) {
-        booking.setStartDate(setTime(booking.getStartDate(), 16, 0));
-        booking.setEndDate(setTime(booking.getEndDate(), 12, 0));
+        booking.setStartDate(setTime(booking.getStartDate(), 16));
+        booking.setEndDate(setTime(booking.getEndDate(), 12));
 
         Date now = new Date();
         if (booking.getStartDate().before(now)) {
@@ -58,8 +58,8 @@ public class BookingService {
     }
 
     public List<Room> findAvailableRooms(Date startDate, Date endDate, int guests) {
-        Date start = setTime(startDate, 16, 0);
-        Date end = setTime(endDate, 12, 0);
+        Date start = setTime(startDate, 16);
+        Date end = setTime(endDate, 12);
 
         List<Room> allRooms = roomRepository.findAll();
 
@@ -81,8 +81,8 @@ public class BookingService {
     }
 
     public boolean updateBooking(Long id, Booking booking) {
-        booking.setStartDate(setTime(booking.getStartDate(), 16, 0));
-        booking.setEndDate(setTime(booking.getEndDate(), 12, 0));
+        booking.setStartDate(setTime(booking.getStartDate(), 16));
+        booking.setEndDate(setTime(booking.getEndDate(), 12));
 
         Date now = new Date();
         if (booking.getStartDate().before(now)) {
