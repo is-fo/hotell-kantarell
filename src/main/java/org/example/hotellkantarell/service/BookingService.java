@@ -57,6 +57,9 @@ public class BookingService {
     }
 
     public List<Room> findAvailableRooms(Date startDate, Date endDate, int guests) {
+        Date start = setTime(startDate, 16, 0);
+        Date end = setTime(endDate, 12, 0);
+
         List<Room> allRooms = roomRepository.findAll();
 
         return allRooms.stream()
@@ -67,7 +70,8 @@ public class BookingService {
                 .filter(room -> {
                     List<Booking> bookings = bookingRepository.findByRoomId(room.getId());
                     for (Booking booking : bookings) {
-                        if (startDate.before(booking.getEndDate()) && endDate.after(booking.getStartDate())) {
+                        // Kontrollera överlapp med korrekta tider
+                        if (!(end.compareTo(booking.getStartDate()) <= 0 || start.compareTo(booking.getEndDate()) >= 0)) {
                             return false;
                         }
                     }
@@ -109,7 +113,9 @@ public class BookingService {
                 .stream()
                 .filter(existing -> !existing.getId().equals(booking.getId()))
                 .anyMatch(existing ->
-                        booking.getStartDate().before(existing.getEndDate()) &&
-                                booking.getEndDate().after(existing.getStartDate()));
+                        !(booking.getEndDate().compareTo(existing.getStartDate()) <= 0 ||
+                                booking.getStartDate().compareTo(existing.getEndDate()) >= 0)
+                );
     }
+
 }
