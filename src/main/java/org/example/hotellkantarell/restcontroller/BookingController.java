@@ -1,6 +1,8 @@
 package org.example.hotellkantarell.restcontroller;
 
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
@@ -33,20 +35,31 @@ public class BookingController {
 
     // TODO FIXA BÄTTRE SVAR
     @PostMapping("/booking")
-    public String addBooking(@RequestBody Booking booking) {
-        return bookingService.createBooking(booking) ? "Success" : "Fail";
+    public ResponseEntity<String> addBooking(@RequestBody Booking booking) {
+        boolean success = bookingService.createBooking(booking);
+        return success
+                ? ResponseEntity.ok("Bokning skapad")
+                : ResponseEntity.status(HttpStatus.CONFLICT).
+                body("Bokning misslyckades: Rummet är redan bokat eller datumen är ogiltiga");
     }
 
     @PatchMapping("/booking/{id}")
-    public String editBooking(@RequestBody Booking booking, @PathVariable Long id) {
-        return bookingService.updateBooking(id, booking) ? "Success" : "Fail";
+    public ResponseEntity<String> editBooking(@RequestBody Booking booking, @PathVariable Long id) {
+        boolean success = bookingService.updateBooking(id, booking);
+        return success
+                ? ResponseEntity.ok("Bokning uppdaterad")
+                : ResponseEntity.status(HttpStatus.CONFLICT).
+                body("Uppdatering misslyckades: Rummet är redan bokat eller bokningen hittades inte");
     }
 
     @DeleteMapping("/booking/{id}")
-    public String deleteBooking(@PathVariable long id) {
-        return bookingService.deleteBooking(id) ? "Success" : "Fail";
+    public ResponseEntity<String> deleteBooking(@PathVariable long id) {
+        boolean success = bookingService.deleteBooking(id);
+        return success
+                ? ResponseEntity.ok("Bokning borttagen")
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).
+                body("Radering misslyckades: Bokningen hittades inte");
     }
-
 
 
 }
