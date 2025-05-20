@@ -17,8 +17,8 @@
         <li th:each="item : ${bookings}">
             <form th:action="@{/profile}" method="get">
                 Rum: <span th:text="|${item.room.beds} Sängar, ${item.room.extraBeds} extrasängar|"></span>,
-                Incheckning: <span th:text="${item.startDate}"></span>,
-                Utcheckning: <span th:text="${item.endDate}"></span>
+                Incheckning: <span th:text="${#dates.format(item.startDate, 'yyyy-MM-dd HH:mm')}"></span>,
+                Utcheckning: <span th:text="${#dates.format(item.endDate, 'yyyy-MM-dd HH:mm')}"></span>
                 <button type="submit">Ta bort</button>
             </form>
         </li>
