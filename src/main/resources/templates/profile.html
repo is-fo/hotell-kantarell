@@ -3,13 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/script/script.js" defer></script>
 </head>
 <body>
+<div>
+    <h2 th:text="${userDetailsLabel}"></h2>
+    <span th:text="${nameLabel + nameValue}"></span>
+    <br>
+    <span th:text="${emailLabel + emailValue}"></span>
+    <form th:action="@{/profile/user/update}" method="get">
+        <button type="submit">Ändra uppgifter</button>
+    </form>
+    <form th:action="@{/profile/user/updatepassword}" method="get">
+        <button type="submit">Ändra lösenord</button>
+    </form>
+</div>
 
-
-<form action="/profile/user/delete" method="POST" >
-  <button type="submit">Delete Account</button>
-</form>
+<div id="error-popup" th:if="${error}">
+    <span th:text="${error}"></span>
+    <button id="close-error">×</button>
+</div>
 <br>
 <div th:if="${bookings != null}">
     <h2>Dina bokningar</h2>
@@ -19,12 +33,29 @@
                 Rum: <span th:text="|${item.room.beds} Sängar, ${item.room.extraBeds} extrasängar|"></span>,
                 Incheckning: <span th:text="${#dates.format(item.startDate, 'yyyy-MM-dd HH:mm')}"></span>,
                 Utcheckning: <span th:text="${#dates.format(item.endDate, 'yyyy-MM-dd HH:mm')}"></span>
-                <button type="submit">Ta bort</button>
+            </form>
+            <form th:action="@{/profile/booking/delete}" method="post">
+                <input type="hidden" name="bookingId" th:value="${item.id}">
+                <button type="submit">TA BORT BOKNING</button>
+            </form>
+
+            <button type="button" th:onclick="'toggleForm(' + ${item.id} + ')'">Uppdatera</button>
+
+            <form th:action="@{/profile/booking/update}" method="post"
+                  th:id="'update-form-' + ${item.id}" style="display:none">
+                <input type="hidden" name="bookingId" th:value="${item.id}" />
+                Ny incheckning: <input type="date" name="start" th:value="${#dates.format(item.startDate, 'yyyy-MM-dd')}" />
+                Ny utcheckning: <input type="date" name="end" th:value="${#dates.format(item.endDate, 'yyyy-MM-dd')}" />
+                <button type="submit">Spara</button>
             </form>
         </li>
     </ul>
 </div>
-
+<br>
+<br>
+<form action="/profile/user/delete" method="POST" >
+    <button type="submit">Radera konto</button>
+</form>
 
 </body>
 </html>

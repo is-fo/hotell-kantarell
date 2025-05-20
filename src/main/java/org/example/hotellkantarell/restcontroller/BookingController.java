@@ -3,15 +3,11 @@ package org.example.hotellkantarell.restcontroller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.example.hotellkantarell.model.Booking;
-import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.service.BookingService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -60,6 +56,7 @@ public class BookingController {
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).
                 body("Radering misslyckades: Bokningen hittades inte");
     }
+
 
 
 }

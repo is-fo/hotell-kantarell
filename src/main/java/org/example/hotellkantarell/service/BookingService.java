@@ -7,12 +7,10 @@ import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-
 
 @Service
 public class BookingService {
@@ -29,26 +27,10 @@ public class BookingService {
         return bookingRepository.findByUserId(user.getId());
     }
 
-    private Date setTime(Date date, int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
-    }
-
     public boolean createBooking(Booking booking) {
-        booking.setStartDate(setTime(booking.getStartDate(), 16, 0));
-        booking.setEndDate(setTime(booking.getEndDate(), 12, 0));
-
-        Date now = new Date();
-        if (booking.getStartDate().before(now)) {
-            return false;
-        }
-
-        if (booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
+        if (
+                booking.getStartDate().after(booking.getEndDate())
+                || isRoomDoubleBooked(booking)) {
             return false;
         }
 
@@ -77,16 +59,11 @@ public class BookingService {
     }
 
     public boolean updateBooking(Long id, Booking booking) {
-        booking.setStartDate(setTime(booking.getStartDate(), 16, 0));
-        booking.setEndDate(setTime(booking.getEndDate(), 12, 0));
-
-        Date now = new Date();
-        if (booking.getStartDate().before(now)) {
-            return false;
-        }
-
         Booking existing = bookingRepository.findById(id).orElse(null);
-        if (existing == null || isRoomDoubleBooked(booking)) {
+        if (
+                existing == null ||
+                booking.getStartDate().after(booking.getEndDate()) ||
+                isRoomDoubleBooked(booking)) {
             return false;
         }
 
@@ -111,5 +88,9 @@ public class BookingService {
                 .anyMatch(existing ->
                         booking.getStartDate().before(existing.getEndDate()) &&
                                 booking.getEndDate().after(existing.getStartDate()));
+    }
+
+    public Optional<Booking> findById(Long id) {
+        return bookingRepository.findById(id);
     }
 }

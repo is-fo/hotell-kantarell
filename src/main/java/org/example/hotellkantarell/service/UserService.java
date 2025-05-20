@@ -1,5 +1,8 @@
 package org.example.hotellkantarell.service;
 
+import jakarta.validation.Valid;
+import org.example.hotellkantarell.dto.EditPasswordRequest;
+import org.example.hotellkantarell.dto.EditProfileRequest;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.model.Booking;
@@ -8,6 +11,7 @@ import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +49,7 @@ public class UserService {
         return null;
     }
 
+
     public boolean deleteUser(User user) {
         Optional<User> exists = userRepository.findById(user.getId());
         List<Booking> bookings = bookingRepository.findByUserId(user.getId());
@@ -54,6 +59,25 @@ public class UserService {
 
         userRepository.delete(exists.get());
         return true;
+    }
+
+    public User editProfile(User user, @Valid @ModelAttribute EditProfileRequest request) {
+        if (request.name() != null) {
+            user.setName(request.name());
+        }
+
+        if (request.email() != null) {
+            user.setEmail(request.email());
+        }
+
+        return userRepository.save(user);
+    }
+
+    public User editPassword(User user, @Valid @ModelAttribute EditPasswordRequest request) {
+        if(request.rawPassword() != null) {
+            user.setPasswordHash(passwordEncoder.encode(request.rawPassword()));
+        }
+        return userRepository.save(user);
     }
 
 }
