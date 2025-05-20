@@ -26,10 +26,10 @@ public class Booking {
     @JoinColumn(name = "user_id")
     User user;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Stockholm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", shape = JsonFormat.Shape.STRING, timezone = "Europe/Stockholm")
     Date startDate;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Europe/Stockholm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", shape = JsonFormat.Shape.STRING, timezone = "Europe/Stockholm")
     Date endDate;
 
     public Booking(Room room, User user, Date startDate, Date endDate) {
