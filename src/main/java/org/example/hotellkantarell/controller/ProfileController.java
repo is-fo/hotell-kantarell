@@ -115,6 +115,7 @@ public class ProfileController {
         if (user == null) {
             return "redirect:/login";
         }
+        session.invalidate();
         return userService.deleteUser(user) ? "redirect:/register" : "redirect:/profile";
     }
 

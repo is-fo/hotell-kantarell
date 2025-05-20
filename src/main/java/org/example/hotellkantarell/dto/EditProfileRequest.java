@@ -8,8 +8,9 @@ import jakarta.validation.constraints.Size;
 
 public record EditProfileRequest(
 
-        @NotBlank(message = "Name is required")
+
         @Pattern(regexp = "^[a-zA-ZåÅäÄöÖ '\\-]+$", message = "Ogiltigt namn")
+        @Size(min = 3, max =50, message = "At least 3 Characters for name")
         String name,
 
         @Email(message = "Invalid email format")
