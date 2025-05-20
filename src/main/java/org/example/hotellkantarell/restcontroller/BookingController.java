@@ -1,15 +1,11 @@
 package org.example.hotellkantarell.restcontroller;
 
 
-import org.springframework.ui.Model;
 import org.example.hotellkantarell.model.Booking;
-import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.service.BookingService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 

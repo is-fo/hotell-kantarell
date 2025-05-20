@@ -38,13 +38,7 @@ public class ProfileController {
         if (user == null) {
             return "redirect:/login";
         }
-        String username = user.getName();
-        String email = user.getEmail();
-        model.addAttribute("userDetailsLabel", "Dina uppgifter");
-        model.addAttribute("nameLabel", "Namn: ");
-        model.addAttribute("emailLabel", "Mailadress: ");
-        model.addAttribute("nameValue", username);
-        model.addAttribute("emailValue", email);
+
         populateProfile(model, user);
 
         return "profile";
@@ -123,13 +117,14 @@ public class ProfileController {
     public String deleteBooking(HttpSession session, @RequestParam Long bookingId, Model model) {
         Booking booking = bookingService.findById(bookingId).orElse(null);
         User user = (User) session.getAttribute("user");
-        if (
+        if (user == null) {
+            return "redirect:/login";
+        } else if (
                 booking == null ||
-                user == null ||
                 !user.getName().equals(booking.getUser().getName()) ||
                 !bookingService.deleteBooking(booking.getId())
         ) {
-            model.addAttribute("error", "Kunde inte ta bort bokningen.");
+            model.addAttribute("error", "Kunde inte ta bort bokningen. Försök igen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
             populateProfile(model, user);
             return "profile";
@@ -147,10 +142,8 @@ public class ProfileController {
         Booking booking = bookingService.findById(bookingId).orElse(null);
         User user = (User) session.getAttribute("user");
         if (booking == null || user == null || !user.getName().equals(booking.getUser().getName())) {
-            model.addAttribute("error", "Något gick snett. Ladda om sidan.");
             System.err.println("Kaffe i servern: " + bookingId);
-            populateProfile(model, user);
-            return "profile";
+            return "redirect:/login";
         }
 
         if (start.after(end)) {
@@ -179,6 +172,11 @@ public class ProfileController {
     }
 
     private void populateProfile(Model model, User user) {
+        model.addAttribute("userDetailsLabel", "Dina uppgifter");
+        model.addAttribute("nameLabel", "Namn: ");
+        model.addAttribute("emailLabel", "Mailadress: ");
+        model.addAttribute("nameValue", user.getName());
+        model.addAttribute("emailValue", user.getEmail());
         List<Booking> bookings = bookingService.findBookingByUser(user);
         model.addAttribute("bookings", bookings);
         List<Room> rooms = bookings.stream().map(Booking::getRoom).toList();
