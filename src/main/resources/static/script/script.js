@@ -1,11 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const btn = document.getElementById('close-error');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            const popup = document.getElementById('error-popup');
+    document.querySelectorAll('.close-notification').forEach(button => {
+        button.addEventListener('click', function() {
+            const popup = button.closest('.notification-popup');
             if (popup) popup.style.display = 'none';
         });
-    }
+    });
 });
 
 function toggleForm(id) {

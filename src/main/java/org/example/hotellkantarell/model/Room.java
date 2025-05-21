@@ -3,9 +3,11 @@ package org.example.hotellkantarell.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 @Data
 @Entity
@@ -27,6 +29,15 @@ public class Room {
 
     @Min(0)
     Integer area = 10;
+
+    @URL(host = "imgur")
+    String imageUrl;
+
+    @Min(0)
+    Integer pricePerNight;
+
+    @Size(min = 3)
+    String roomNumber;
 
     public Room(Integer beds, Integer extraBeds, Integer area) {
         this.beds = beds;
