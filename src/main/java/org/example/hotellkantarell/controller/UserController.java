@@ -3,6 +3,7 @@ package org.example.hotellkantarell.controller;
 import jakarta.servlet.http.HttpSession;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
+import org.example.hotellkantarell.dto.UserDto;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.UserRepository;
 import org.example.hotellkantarell.service.UserService;
@@ -37,7 +38,7 @@ public class UserController {
 
     @PostMapping("/login")
     public String loginUser(@ModelAttribute LoginRequest loginRequest, HttpSession session) {
-        User user = userService.login(loginRequest);
+        UserDto user = userService.login(loginRequest);
         if (user != null) {
             session.setAttribute("user", user);
             return "start";

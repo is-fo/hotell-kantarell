@@ -36,7 +36,7 @@
             </form>
             <form th:action="@{/profile/booking/delete}" method="post">
                 <input type="hidden" name="bookingId" th:value="${item.id}">
-                <button type="submit">TA BORT BOKNING</button>
+                <button type="submit">Avboka</button>
             </form>
 
             <button type="button" th:onclick="'toggleForm(' + ${item.id} + ')'">Uppdatera</button>

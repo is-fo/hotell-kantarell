@@ -7,7 +7,6 @@ import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -42,10 +41,10 @@ public class UserService {
         ));
     }
 
-    public User login(LoginRequest loginRequest) {
+    public UserDto login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.email());
         if (user != null && passwordEncoder.matches(loginRequest.rawPassword(), user.getPasswordHash())) {
-            return user;
+            return userMapper.userToDto(user);
         }
         return null;
     }

@@ -2,11 +2,7 @@ package org.example.hotellkantarell.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.example.hotellkantarell.dto.BookingDto;
-import org.example.hotellkantarell.dto.EditPasswordRequest;
-import org.example.hotellkantarell.dto.EditProfileRequest;
-import org.example.hotellkantarell.dto.UserDto;
-import org.example.hotellkantarell.mapper.UserMapper;
+import org.example.hotellkantarell.dto.*;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
 import org.example.hotellkantarell.util.DateUtil;
@@ -26,17 +22,15 @@ import java.util.List;
 public class ProfileController {
     private final UserService userService;
     private final BookingService bookingService;
-    private final UserMapper userMapper;
 
-    public ProfileController(UserService userService, BookingService bookingService, UserMapper userMapper) {
+    public ProfileController(UserService userService, BookingService bookingService) {
         this.userService = userService;
         this.bookingService = bookingService;
-        this.userMapper = userMapper;
     }
 
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -48,7 +42,7 @@ public class ProfileController {
 
     @GetMapping("/profile/user/update")
     public String showEditProfile(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -56,8 +50,8 @@ public class ProfileController {
         model.addAttribute("userDetails", "Ändra dina uppgifter");
         model.addAttribute("nameLabel", "Namn: ");
         model.addAttribute("emailLabel", "Mailadress: ");
-        model.addAttribute("nameValue", user.getName());
-        model.addAttribute("emailValue", user.getEmail());
+        model.addAttribute("nameValue", user.name());
+        model.addAttribute("emailValue", user.email());
 
         return "editprofile";
     }
@@ -117,13 +111,13 @@ public class ProfileController {
 
     @PostMapping("/profile/booking/delete")
     public String deleteBooking(HttpSession session, @RequestParam Long bookingId, Model model) {
-        BookingDto booking = bookingService.findById(bookingId).orElse(null);
+        BookingDto booking = bookingService.findById(bookingId);
         UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         } else if (
                 booking == null ||
-                !user.getName().equals(booking.user().name()) ||
+                !user.name().equals(booking.user().name()) ||
                 !bookingService.deleteBooking(booking.id())
         ) {
             model.addAttribute("error", "Kunde inte ta bort bokningen. Försök igen.");
@@ -141,9 +135,10 @@ public class ProfileController {
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
                                 Model model) {
-        Booking booking = bookingService.findById(bookingId).orElse(null);
-        User user = (User) session.getAttribute("user");
-        if (booking == null || user == null || !user.getName().equals(booking.getUser().getName())) {
+        BookingDto booking = bookingService.findById(bookingId);
+        UserDto user = (UserDto) session.getAttribute("user");
+        if (booking == null || user == null || !user.id().equals(booking.user().id())) {
+            System.out.println("Booking: " + booking + "\nUser: " + user);
             System.err.println("Kaffe i servern: " + bookingId);
             return "redirect:/login";
         }
@@ -160,10 +155,7 @@ public class ProfileController {
             return "profile";
         }
 
-        booking.setStartDate(start);
-        booking.setEndDate(end);
-
-        if (!bookingService.updateBooking(booking.getId(), booking)) {
+        if (!bookingService.updateBooking(booking.id(), booking)) {
             model.addAttribute("error", "Kunde inte uppdatera bokningen.");
             System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId);
             populateProfile(model, user);
@@ -177,11 +169,11 @@ public class ProfileController {
         model.addAttribute("userDetailsLabel", "Dina uppgifter");
         model.addAttribute("nameLabel", "Namn: ");
         model.addAttribute("emailLabel", "Mailadress: ");
-        model.addAttribute("nameValue", user.getName());
-        model.addAttribute("emailValue", user.getEmail());
-        List<Booking> bookings = bookingService.findBookingByUser(user);
+        model.addAttribute("nameValue", user.name());
+        model.addAttribute("emailValue", user.email());
+        List<BookingDto> bookings = bookingService.findBookingByUser(user);
         model.addAttribute("bookings", bookings);
-        List<Room> rooms = bookings.stream().map(Booking::getRoom).toList();
+        List<RoomDto> rooms = bookings.stream().map(BookingDto::room).toList();
         model.addAttribute("rooms", rooms);
     }
 }

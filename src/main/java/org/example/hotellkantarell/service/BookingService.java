@@ -1,11 +1,15 @@
 package org.example.hotellkantarell.service;
 
+import jakarta.transaction.Transactional;
 import org.example.hotellkantarell.dto.BookingDto;
 import org.example.hotellkantarell.dto.RoomDto;
 import org.example.hotellkantarell.dto.UserDto;
 import org.example.hotellkantarell.mapper.BookingMapper;
 import org.example.hotellkantarell.mapper.RoomMapper;
+import org.example.hotellkantarell.mapper.UserMapper;
 import org.example.hotellkantarell.model.Booking;
+import org.example.hotellkantarell.model.Room;
+import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
 import org.springframework.stereotype.Service;
@@ -22,12 +26,14 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final RoomMapper roomMapper;
+    private final UserMapper userMapper;
 
-    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper) {
+    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper, UserMapper userMapper) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
         this.roomMapper = roomMapper;
+        this.userMapper = userMapper;
     }
 
     public List<BookingDto> findBookingByUser(UserDto user) {
@@ -57,7 +63,7 @@ public class BookingService {
             return false;
         }
 
-        if (newBooking.getStartDate().after(booking.endDate()) || isRoomDoubleBooked(booking)) {
+        if (newBooking.getStartDate().after(booking.endDate()) || isRoomDoubleBooked(newBooking)) {
             return false;
         }
 
@@ -89,25 +95,52 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    public boolean updateBooking(Long id, BookingDto booking) {
-//        booking.setStartDate(setTime(booking.getStartDate(), 16));
-//        booking.setEndDate(setTime(booking.getEndDate(), 12));
+//    public boolean updateBooking(Long id, BookingDto bookingDto) {
+//
+//        if (bookingDto.startDate().before(new Date())) {
+//            return false;
+//        }
+//
+//        Booking existing = bookingRepository.findById(id).orElse(null);
+//        if (
+//                existing == null ||
+//                bookingDto.startDate().after(bookingDto.endDate()) ||
+//                isRoomDoubleBooked(bookingDto)) {
+//            return false;
+//        }
+//        existing.setStartDate(setTime(bookingDto.startDate(), 16));
+//        existing.setEndDate(setTime(bookingDto.endDate(), 12));
+//
+//        Room updatedRoom = roomMapper.dtoToRoom(bookingDto.room());
+//        User updatedUser = userMapper.dtoToUser(bookingDto.user());
+//
+//        existing.setRoom(updatedRoom);
+//        existing.setUser(updatedUser);
+//
+//        existing.setId(id);
+//        bookingRepository.save(existing);
+//        return true;
+//    }
 
-        if (booking.startDate().before(new Date())) {
+    public boolean updateBooking(Long id, BookingDto booking) {
+        Booking b = bookingMapper.dtoToBooking(booking);
+        b.setStartDate(setTime(booking.startDate(), 16));
+        b.setEndDate(setTime(booking.endDate(), 12));
+
+        Date now = new Date();
+        if (booking.startDate().before(now)) {
             return false;
         }
 
         Booking existing = bookingRepository.findById(id).orElse(null);
         if (
                 existing == null ||
-                booking.startDate().after(booking.endDate()) ||
-                isRoomDoubleBooked(booking)) {
+                booking.startDate().after(booking.endDate()) || isRoomDoubleBooked(bookingMapper.dtoToBooking(booking))) {
             return false;
         }
 
-        Booking updatedBooking = bookingMapper.dtoToBooking(booking);
-        updatedBooking.setId(id);
-        bookingRepository.save(updatedBooking);
+        b.setId(id);
+        bookingRepository.save(b);
         return true;
     }
 
@@ -120,13 +153,13 @@ public class BookingService {
         return true;
     }
 
-    private boolean isRoomDoubleBooked(BookingDto booking) {
-        return bookingRepository.findByRoomId(booking.room().id())
+    private boolean isRoomDoubleBooked(Booking booking) {
+        return bookingRepository.findByRoomId(booking.getRoom().getId())
                 .stream()
-                .filter(existing -> !existing.getId().equals(booking.id()))
+                .filter(existing -> !existing.getId().equals(booking.getId()))
                 .anyMatch(existing ->
-                        !(booking.endDate().compareTo(existing.getStartDate()) <= 0 ||
-                                booking.startDate().compareTo(existing.getEndDate()) >= 0)
+                        !(booking.getEndDate().compareTo(existing.getStartDate()) <= 0 ||
+                                booking.getStartDate().compareTo(existing.getEndDate()) >= 0)
                 );
     }
 
