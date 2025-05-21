@@ -1,10 +1,8 @@
-#error-popup {
+.notification-popup {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #f44336;
-    color: white;
     padding: 16px;
     border-radius: 8px;
     z-index: 1000;
@@ -14,11 +12,21 @@
     align-items: center;
 }
 
-#error-popup button {
+.notification-popup button {
     background: none;
     border: none;
     color: white;
     font-weight: bold;
     font-size: 16px;
     cursor: pointer;
+}
+
+.error {
+    background-color: red;
+    color: white;
+}
+
+.success {
+    background-color: green;
+    color: white;
 }

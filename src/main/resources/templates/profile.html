@@ -20,10 +20,14 @@
     </form>
 </div>
 
-<div id="error-popup" th:if="${error}">
-    <span th:text="${error}"></span>
-    <button id="close-error">×</button>
-</div>
+    <div class="notification-popup error" th:if="${error}">
+        <span th:text="${error}"></span>
+        <button class="close-notification">×</button>
+    </div>
+    <div class="notification-popup success" th:if="${success}">
+        <span th:text="${success}"></span>
+        <button class="close-notification">×</button>
+    </div>
 <br>
 <div th:if="${bookings != null}">
     <h2>Dina bokningar</h2>

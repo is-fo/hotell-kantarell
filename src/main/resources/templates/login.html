@@ -7,6 +7,14 @@
     <script src="/script/script.js" defer></script>
 </head>
 <body>
+    <div class="notification-popup error" th:if="${error}">
+        <span th:text="${error}"></span>
+        <button class="close-notification">×</button>
+    </div>
+    <div class="notification-popup success" th:if="${success}">
+        <span th:text="${success}"></span>
+        <button class="close-notification">×</button>
+    </div>
     <form action="/login" method="post">
         <input type="text" name="email" placeholder="Email" />
         <input type="password" name="rawPassword" placeholder="Password" />
