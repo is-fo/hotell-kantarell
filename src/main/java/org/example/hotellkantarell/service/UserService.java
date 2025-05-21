@@ -1,14 +1,13 @@
 package org.example.hotellkantarell.service;
 
 import jakarta.validation.Valid;
-import org.example.hotellkantarell.dto.EditPasswordRequest;
-import org.example.hotellkantarell.dto.EditProfileRequest;
-import org.example.hotellkantarell.dto.LoginRequest;
-import org.example.hotellkantarell.dto.RegisterRequest;
+import org.example.hotellkantarell.dto.*;
+import org.example.hotellkantarell.mapper.UserMapper;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,11 +21,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, BookingRepository bookingRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BookingRepository bookingRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     public User register(RegisterRequest registerRequest) {
@@ -50,9 +51,10 @@ public class UserService {
     }
 
 
-    public boolean deleteUser(User user) {
-        Optional<User> exists = userRepository.findById(user.getId());
-        List<Booking> bookings = bookingRepository.findByUserId(user.getId());
+    public boolean deleteUser(UserDto userDto) {
+
+        Optional<User> exists = userRepository.findById(userDto.id());
+        List<Booking> bookings = bookingRepository.findByUserId(userDto.id());
         if (exists.isEmpty() || bookings == null || !bookings.isEmpty()) {
             return false;
         }
@@ -61,7 +63,8 @@ public class UserService {
         return true;
     }
 
-    public User editProfile(User user, @Valid @ModelAttribute EditProfileRequest request) {
+    public UserDto editProfile(UserDto userDto, @Valid @ModelAttribute EditProfileRequest request) {
+        User user = userMapper.dtoToUser(userDto);
         if (request.name() != null) {
             user.setName(request.name());
         }
@@ -70,14 +73,15 @@ public class UserService {
             user.setEmail(request.email());
         }
 
-        return userRepository.save(user);
+        return userMapper.userToDto(userRepository.save(user));
     }
 
-    public User editPassword(User user, @Valid @ModelAttribute EditPasswordRequest request) {
+    public UserDto editPassword(UserDto userDto, @Valid @ModelAttribute EditPasswordRequest request) {
+        User user = userMapper.dtoToUser(userDto);
         if(request.rawPassword() != null) {
             user.setPasswordHash(passwordEncoder.encode(request.rawPassword()));
         }
-        return userRepository.save(user);
+        return userMapper.userToDto(userRepository.save(user));
     }
 
 }

@@ -2,11 +2,11 @@ package org.example.hotellkantarell.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.example.hotellkantarell.dto.BookingDto;
 import org.example.hotellkantarell.dto.EditPasswordRequest;
 import org.example.hotellkantarell.dto.EditProfileRequest;
-import org.example.hotellkantarell.model.Booking;
-import org.example.hotellkantarell.model.Room;
-import org.example.hotellkantarell.model.User;
+import org.example.hotellkantarell.dto.UserDto;
+import org.example.hotellkantarell.mapper.UserMapper;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
 import org.example.hotellkantarell.util.DateUtil;
@@ -26,10 +26,12 @@ import java.util.List;
 public class ProfileController {
     private final UserService userService;
     private final BookingService bookingService;
+    private final UserMapper userMapper;
 
-    public ProfileController(UserService userService, BookingService bookingService) {
+    public ProfileController(UserService userService, BookingService bookingService, UserMapper userMapper) {
         this.userService = userService;
         this.bookingService = bookingService;
+        this.userMapper = userMapper;
     }
 
     @GetMapping("/profile")
@@ -63,7 +65,7 @@ public class ProfileController {
     @PostMapping("/profile/user/update")
     public String editProfile(@ModelAttribute @Valid EditProfileRequest editProfileRequest, BindingResult result, HttpSession session, Model model) {
 
-        User currentUser = (User) session.getAttribute("user");
+        UserDto currentUser = (UserDto) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
         }
@@ -74,7 +76,7 @@ public class ProfileController {
             return "editprofile";
         }
 
-        User updated = userService.editProfile(currentUser, editProfileRequest);
+        UserDto updated = userService.editProfile(currentUser, editProfileRequest);
         session.setAttribute("user", updated);
 
         return "redirect:/profile";
@@ -82,12 +84,12 @@ public class ProfileController {
 
     @PostMapping("/profile/user/updatepassword")
     public String updatePassword(@ModelAttribute @Valid EditPasswordRequest editPasswordRequest, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
+        UserDto currentUser = (UserDto) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
         }
 
-        User updated = userService.editPassword(currentUser, editPasswordRequest);
+        UserDto updated = userService.editPassword(currentUser, editPasswordRequest);
         session.setAttribute("user", updated);
 
         return "redirect:/profile";
@@ -95,7 +97,7 @@ public class ProfileController {
 
     @GetMapping("/profile/user/updatepassword")
     public String showUpdatePasswordForm(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -105,7 +107,7 @@ public class ProfileController {
 
     @PostMapping("/profile/user/delete")
     public String deleteUser(HttpSession session) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -115,14 +117,14 @@ public class ProfileController {
 
     @PostMapping("/profile/booking/delete")
     public String deleteBooking(HttpSession session, @RequestParam Long bookingId, Model model) {
-        Booking booking = bookingService.findById(bookingId).orElse(null);
-        User user = (User) session.getAttribute("user");
+        BookingDto booking = bookingService.findById(bookingId).orElse(null);
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         } else if (
                 booking == null ||
-                !user.getName().equals(booking.getUser().getName()) ||
-                !bookingService.deleteBooking(booking.getId())
+                !user.getName().equals(booking.user().name()) ||
+                !bookingService.deleteBooking(booking.id())
         ) {
             model.addAttribute("error", "Kunde inte ta bort bokningen. Försök igen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
@@ -171,7 +173,7 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
-    private void populateProfile(Model model, User user) {
+    private void populateProfile(Model model, UserDto user) {
         model.addAttribute("userDetailsLabel", "Dina uppgifter");
         model.addAttribute("nameLabel", "Namn: ");
         model.addAttribute("emailLabel", "Mailadress: ");
