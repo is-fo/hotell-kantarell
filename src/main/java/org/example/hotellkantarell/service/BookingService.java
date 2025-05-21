@@ -130,7 +130,8 @@ public class BookingService {
                 );
     }
 
-    public Optional<Booking> findById(Long id) {
-        return bookingRepository.findById(id);
+    public BookingDto findById(Long id) {
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        return booking != null ? bookingMapper.bookingToDto(booking) : null;
     }
 }
