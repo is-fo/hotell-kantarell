@@ -60,9 +60,10 @@ public class BookingPageController {
         Booking booking = new Booking(room, user, start, end);
 
         if (!bookingService.createBooking(booking)) {
-            model.addAttribute("error", "Kunde inte genomföra bokningen. Se till att startdatumet är innan slutdatum och inte i dåtiden.");
+            model.addAttribute("error", "Kunde inte genomföra bokningen. " +
+                    "Se till att startdatumet är innan slutdatum och inte i dåtiden.");
         } else {
-            model.addAttribute("sucess", "Bokningen tillagd, ha så kult på restaurangen.");
+            model.addAttribute("success", "Bokningen tillagd, ha så kult på restaurangen.");
         }
         return "start";
     }

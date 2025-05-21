@@ -19,7 +19,7 @@ public class User {
     Long id;
 
     @Pattern(regexp = "^[a-zA-ZåÅäÄöÖ '\\-]+$", message = "Ogiltigt namn")
-    @Size(min = 3, max =50, message = "At least 3 Characters for name")
+    @Size(min = 3, max =50, message = "Namnet måste vara minst 3 tecken långt")
     String name;
 
     @Email
