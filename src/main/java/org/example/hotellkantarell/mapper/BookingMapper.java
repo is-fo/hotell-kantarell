@@ -14,16 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class BookingMapper {
 
-    private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
-    private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
     private final UserMapper userMapper;
 
-    public BookingMapper(BookingRepository bookingRepository, UserRepository userRepository, RoomRepository roomRepository, RoomMapper roomMapper, UserMapper userMapper) {
-        this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
-        this.roomRepository = roomRepository;
+    public BookingMapper(RoomMapper roomMapper, UserMapper userMapper) {
         this.roomMapper = roomMapper;
         this.userMapper = userMapper;
     }
@@ -40,7 +34,9 @@ public class BookingMapper {
         Room room = roomMapper.dtoToRoom(bookingDto.room());
         User user = userMapper.dtoToUser(bookingDto.user());
 
-        return new Booking(bookingDto.id(), room, user, bookingDto.startDate(), bookingDto.endDate());
+        return (bookingDto.id()!= null)
+                ? new Booking(bookingDto.id(), room, user, bookingDto.startDate(), bookingDto.endDate())
+                : new Booking(room, user, bookingDto.startDate(), bookingDto.endDate());
     }
 
 }
