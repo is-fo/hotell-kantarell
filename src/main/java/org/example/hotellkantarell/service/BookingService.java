@@ -122,25 +122,21 @@ public class BookingService {
 //        return true;
 //    }
 
-    public boolean updateBooking(Long id, BookingDto booking) {
-        Booking b = bookingMapper.dtoToBooking(booking);
-        b.setStartDate(setTime(booking.startDate(), 16));
-        b.setEndDate(setTime(booking.endDate(), 12));
-
-        Date now = new Date();
-        if (booking.startDate().before(now)) {
+    public boolean updateBooking(Long id, Date start, Date end) {
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (booking == null) {
             return false;
         }
-
-        Booking existing = bookingRepository.findById(id).orElse(null);
-        if (
-                existing == null ||
-                booking.startDate().after(booking.endDate()) || isRoomDoubleBooked(bookingMapper.dtoToBooking(booking))) {
+        if (start.before(new Date())) {
             return false;
         }
+        if (start.after(end)) {
+            return false;
+        }
+        booking.setStartDate(setTime(start, 16));
+        booking.setEndDate(setTime(end, 12));
 
-        b.setId(id);
-        bookingRepository.save(b);
+        bookingRepository.save(booking);
         return true;
     }
 

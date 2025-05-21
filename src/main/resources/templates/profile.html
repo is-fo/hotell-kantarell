@@ -25,27 +25,27 @@
     <button id="close-error">×</button>
 </div>
 <br>
-<div th:if="${bookings != null}">
+<div th:if="${bookingsDto != null}">
     <h2>Dina bokningar</h2>
     <ul>
-        <li th:each="item : ${bookings}">
+        <li th:each="bookingDto : ${bookingsDto}">
             <form th:action="@{/profile}" method="get">
-                Rum: <span th:text="|${item.room.beds} Sängar, ${item.room.extraBeds} extrasängar|"></span>,
-                Incheckning: <span th:text="${#dates.format(item.startDate, 'yyyy-MM-dd HH:mm')}"></span>,
-                Utcheckning: <span th:text="${#dates.format(item.endDate, 'yyyy-MM-dd HH:mm')}"></span>
+                Rum: <span th:text="|${bookingDto.room.beds} Sängar, ${bookingDto.room.extraBeds} extrasängar|"></span>,
+                Incheckning: <span th:text="${#dates.format(bookingDto.startDate, 'yyyy-MM-dd HH:mm')}"></span>,
+                Utcheckning: <span th:text="${#dates.format(bookingDto.endDate, 'yyyy-MM-dd HH:mm')}"></span>
             </form>
             <form th:action="@{/profile/booking/delete}" method="post">
-                <input type="hidden" name="bookingId" th:value="${item.id}">
+                <input type="hidden" name="bookingId" th:value="${bookingDto.id}">
                 <button type="submit">Avboka</button>
             </form>
 
-            <button type="button" th:onclick="'toggleForm(' + ${item.id} + ')'">Uppdatera</button>
+            <button type="button" th:onclick="'toggleForm(' + ${bookingDto.id} + ')'">Uppdatera</button>
 
             <form th:action="@{/profile/booking/update}" method="post"
-                  th:id="'update-form-' + ${item.id}" style="display:none">
-                <input type="hidden" name="bookingId" th:value="${item.id}" />
-                Ny incheckning: <input type="date" name="start" th:value="${#dates.format(item.startDate, 'yyyy-MM-dd')}" />
-                Ny utcheckning: <input type="date" name="end" th:value="${#dates.format(item.endDate, 'yyyy-MM-dd')}" />
+                  th:id="'update-form-' + ${bookingDto.id}" style="display:none">
+                <input type="hidden" name="bookingId" th:value="${bookingDto.id}" />
+                Ny incheckning: <input type="date" name="start" th:value="${#dates.format(bookingDto.startDate, 'yyyy-MM-dd')}" />
+                Ny utcheckning: <input type="date" name="end" th:value="${#dates.format(bookingDto.endDate, 'yyyy-MM-dd')}" />
                 <button type="submit">Spara</button>
             </form>
         </li>

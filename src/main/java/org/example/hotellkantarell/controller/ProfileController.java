@@ -135,33 +135,15 @@ public class ProfileController {
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
                                 Model model) {
-        BookingDto booking = bookingService.findById(bookingId);
         UserDto user = (UserDto) session.getAttribute("user");
-        if (booking == null || user == null || !user.id().equals(booking.user().id())) {
-            System.out.println("Booking: " + booking + "\nUser: " + user);
-            System.err.println("Kaffe i servern: " + bookingId);
-            return "redirect:/login";
-        }
 
-        if (start.after(end)) {
-            model.addAttribute("error", "Startdatum måste vara före slutdatum.");
-            populateProfile(model, user);
-            return "profile";
-        }
 
-        if (start.before(DateUtil.nDaysInFuture(-1))) {
-            model.addAttribute("error", "Startdatum måste vara idag eller i framtiden");
-            populateProfile(model, user);
-            return "profile";
-        }
-
-        if (!bookingService.updateBooking(booking.id(), booking)) {
+        if (!bookingService.updateBooking(bookingId, start, end)) {
             model.addAttribute("error", "Kunde inte uppdatera bokningen.");
             System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId);
             populateProfile(model, user);
             return "profile";
         }
-
         return "redirect:/profile";
     }
 
@@ -171,9 +153,9 @@ public class ProfileController {
         model.addAttribute("emailLabel", "Mailadress: ");
         model.addAttribute("nameValue", user.name());
         model.addAttribute("emailValue", user.email());
-        List<BookingDto> bookings = bookingService.findBookingByUser(user);
-        model.addAttribute("bookings", bookings);
-        List<RoomDto> rooms = bookings.stream().map(BookingDto::room).toList();
+        List<BookingDto> bookingsDto = bookingService.findBookingByUser(user);
+        model.addAttribute("bookingsDto", bookingsDto);
+        List<RoomDto> rooms = bookingsDto.stream().map(BookingDto::room).toList();
         model.addAttribute("rooms", rooms);
     }
 }
