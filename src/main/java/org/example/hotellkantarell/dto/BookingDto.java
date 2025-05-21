@@ -1,5 +1,7 @@
 package org.example.hotellkantarell.dto;
 
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -10,13 +12,8 @@ public record BookingDto(
         RoomDto room,
         UserDto user,
         Date startDate,
-        Date endDate,
-        Long totalPrice
+        Date endDate
 ) {
-
-    public BookingDto {
-        totalPrice = setTotalPrice();
-    }
 
     Long setTotalPrice() {
         assert startDate != null;
@@ -26,4 +23,5 @@ public record BookingDto(
         assert room != null;
         return room.pricePerNight() * ChronoUnit.DAYS.between(start, end);
     }
+
 }
