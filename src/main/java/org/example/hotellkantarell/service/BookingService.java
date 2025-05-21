@@ -7,10 +7,7 @@ import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -27,7 +24,10 @@ public class BookingService {
     }
 
     public List<Booking> findBookingByUser(User user) {
-        return bookingRepository.findByUserId(user.getId());
+        return bookingRepository.findByUserId(user.getId())
+                .stream()
+                .sorted(Comparator.comparing(Booking::getStartDate))
+                .collect(Collectors.toList());
     }
 
     private Date setTime(Date date, int hour) {
