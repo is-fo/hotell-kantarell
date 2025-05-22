@@ -3,6 +3,9 @@ package org.example.hotellkantarell.service;
 import org.example.hotellkantarell.dto.BookingDto;
 import org.example.hotellkantarell.dto.RoomDto;
 import org.example.hotellkantarell.dto.UserDto;
+import org.example.hotellkantarell.model.Room;
+import org.example.hotellkantarell.model.User;
+import org.example.hotellkantarell.repository.UserRepository;
 import org.example.hotellkantarell.status.BookingStatus;
 import org.example.hotellkantarell.mapper.BookingMapper;
 import org.example.hotellkantarell.mapper.RoomMapper;
@@ -23,12 +26,14 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final RoomMapper roomMapper;
+    private final UserRepository userRepository;
 
-    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper) {
+    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper, UserRepository userRepository) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
         this.roomMapper = roomMapper;
+        this.userRepository = userRepository;
     }
 
     public List<BookingDto> findBookingByUser(UserDto user) {
@@ -50,21 +55,35 @@ public class BookingService {
         return calendar.getTime();
     }
 
-    public boolean createBooking(BookingDto booking) {
-        Booking newBooking = bookingMapper.dtoToBooking(booking);
-        newBooking.setStartDate(setTime(booking.startDate(), 16));
-        newBooking.setEndDate(setTime(booking.endDate(), 12));
-        Date now = new Date();
-        if (newBooking.getStartDate().before(now)) {
-            return false;
+    public BookingStatus createBooking(Long roomId, UserDto userDto, Date start, Date end) {
+        Room room = roomRepository.findById(roomId).orElse(null);
+        start = setTime(start, 16);
+        end = setTime(end, 12);
+        if (room == null) {
+            return MALFORMED_BOOKING_ROOM;
+        }
+        User user = userRepository.findById(userDto.id()).orElse(null);
+        if (user == null) {
+            return MALFORMED_BOOKING_USER;
+        }
+        if (start.after(end)) {
+            return REVERSE_DATE;
+        }
+        if (start.before(new Date())) {
+            return EXPIRED_DATE;
+        }
+        Booking booking = new Booking(
+                room,
+                user,
+                start,
+                end
+        );
+        if (isRoomDoubleBooked(booking)) {
+            return DOUBLE_BOOKED;
         }
 
-        if (newBooking.getStartDate().after(booking.endDate()) || isRoomDoubleBooked(newBooking)) {
-            return false;
-        }
-
-        bookingRepository.save(bookingMapper.dtoToBooking(booking));
-        return true;
+        bookingRepository.save(booking);
+        return SUCCESS;
     }
 
     public List<RoomDto> findAvailableRooms(Date startDate, Date endDate, int guests) {
@@ -92,6 +111,8 @@ public class BookingService {
 
     public BookingStatus updateBooking(UserDto user, Long id, Date start, Date end) {
         Booking booking = bookingRepository.findById(id).orElse(null);
+        start = setTime(start, 16);
+        end = setTime(end, 12);
         if (start.before(new Date())) {
             return EXPIRED_DATE;
         }
@@ -110,8 +131,8 @@ public class BookingService {
         if (isRoomDoubleBooked(booking)) {
             return DOUBLE_BOOKED;
         }
-        booking.setStartDate(setTime(start, 16));
-        booking.setEndDate(setTime(end, 12));
+        booking.setStartDate(start);
+        booking.setEndDate(end);
 
         bookingRepository.save(booking);
         return SUCCESS;

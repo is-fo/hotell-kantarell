@@ -20,12 +20,12 @@
     </form>
 </div>
 
-    <div class="notification-popup error" th:if="${error}">
+    <div class="notification-popup error" th:if="${error != null}">
         <span th:text="${error}"></span>
         <button class="close-notification">×</button>
     </div>
-    <div class="notification-popup success" th:if="${success}">
-        <span th:text="${success}"></span>
+    <div class="notification-popup success" th:if="${session.success}">
+        <span th:text="${session.success}"></span>
         <button class="close-notification">×</button>
     </div>
 <br>

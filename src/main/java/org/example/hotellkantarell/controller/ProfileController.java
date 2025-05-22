@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Date;
 import java.util.List;
@@ -133,16 +134,18 @@ public class ProfileController {
                                 @RequestParam Long bookingId,
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
-                                Model model) {
+                                RedirectAttributes redirectAttributes) {
         UserDto user = (UserDto) session.getAttribute("user");
 
         final var result = bookingService.updateBooking(user, bookingId, start, end);
         if (!result.equals(BookingStatus.SUCCESS)) {
-            model.addAttribute("error", result.getMessage());
+            redirectAttributes.addFlashAttribute("error", result.getMessage());
             System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId + "Fel: " + result.getMessage());
-            return "redirect:/profile";
+        } else {
+            redirectAttributes.addFlashAttribute("success", result.getMessage());
         }
         return "redirect:/profile";
+
     }
 
     private void populateProfile(Model model, UserDto user) {
