@@ -33,7 +33,7 @@ public class Room {
     @Min(0)
     Integer area = 10;
 
-    @URL(host = "imgur")
+    @URL(host = "i.imgur.com")
     String imageUrl;
 
     @Min(0)

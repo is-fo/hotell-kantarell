@@ -49,6 +49,7 @@ public class BookingPageController {
                            @RequestParam("room.id") Long roomId, HttpSession session, Model model) {
         UserDto user = (UserDto) session.getAttribute("user");
 
+
         RoomDto roomDto = roomService.findById(roomId);
         if (roomDto == null) {
             model.addAttribute("error", "Rummet kunde inte hittas.");
