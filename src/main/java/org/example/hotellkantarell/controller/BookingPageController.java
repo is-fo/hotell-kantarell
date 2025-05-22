@@ -14,8 +14,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static org.example.hotellkantarell.status.BookingStatus.EXPIRED_DATE;
+import static org.example.hotellkantarell.status.BookingStatus.REVERSE_DATE;
 
 @Controller
 public class BookingPageController {
