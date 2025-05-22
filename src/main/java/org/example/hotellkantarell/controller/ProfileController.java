@@ -2,14 +2,10 @@ package org.example.hotellkantarell.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.example.hotellkantarell.dto.EditPasswordRequest;
-import org.example.hotellkantarell.dto.EditProfileRequest;
-import org.example.hotellkantarell.model.Booking;
-import org.example.hotellkantarell.model.Room;
-import org.example.hotellkantarell.model.User;
+import org.example.hotellkantarell.dto.*;
+import org.example.hotellkantarell.status.BookingStatus;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
-import org.example.hotellkantarell.util.DateUtil;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,7 +30,7 @@ public class ProfileController {
 
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -46,7 +42,7 @@ public class ProfileController {
 
     @GetMapping("/profile/user/update")
     public String showEditProfile(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -54,8 +50,8 @@ public class ProfileController {
         model.addAttribute("userDetails", "Ändra dina uppgifter");
         model.addAttribute("nameLabel", "Namn: ");
         model.addAttribute("emailLabel", "Mailadress: ");
-        model.addAttribute("nameValue", user.getName());
-        model.addAttribute("emailValue", user.getEmail());
+        model.addAttribute("nameValue", user.name());
+        model.addAttribute("emailValue", user.email());
 
         return "editprofile";
     }
@@ -63,7 +59,7 @@ public class ProfileController {
     @PostMapping("/profile/user/update")
     public String editProfile(@ModelAttribute @Valid EditProfileRequest editProfileRequest, BindingResult result, HttpSession session, Model model) {
 
-        User currentUser = (User) session.getAttribute("user");
+        UserDto currentUser = (UserDto) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
         }
@@ -74,7 +70,7 @@ public class ProfileController {
             return "editprofile";
         }
 
-        User updated = userService.editProfile(currentUser, editProfileRequest);
+        UserDto updated = userService.editProfile(currentUser, editProfileRequest);
         session.setAttribute("user", updated);
 
         return "redirect:/profile";
@@ -82,12 +78,12 @@ public class ProfileController {
 
     @PostMapping("/profile/user/updatepassword")
     public String updatePassword(@ModelAttribute @Valid EditPasswordRequest editPasswordRequest, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
+        UserDto currentUser = (UserDto) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
         }
 
-        User updated = userService.editPassword(currentUser, editPasswordRequest);
+        UserDto updated = userService.editPassword(currentUser, editPasswordRequest);
         session.setAttribute("user", updated);
 
         return "redirect:/profile";
@@ -95,7 +91,7 @@ public class ProfileController {
 
     @GetMapping("/profile/user/updatepassword")
     public String showUpdatePasswordForm(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -105,7 +101,7 @@ public class ProfileController {
 
     @PostMapping("/profile/user/delete")
     public String deleteUser(HttpSession session) {
-        User user = (User) session.getAttribute("user");
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
@@ -115,19 +111,19 @@ public class ProfileController {
 
     @PostMapping("/profile/booking/delete")
     public String deleteBooking(HttpSession session, @RequestParam Long bookingId, Model model) {
-        Booking booking = bookingService.findById(bookingId).orElse(null);
-        User user = (User) session.getAttribute("user");
+        BookingDto booking = bookingService.findById(bookingId);
+        UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         } else if (
                 booking == null ||
-                !user.getName().equals(booking.getUser().getName()) ||
-                !bookingService.deleteBooking(booking.getId())
+                        !user.name().equals(booking.user().name()) ||
+                        !bookingService.deleteBooking(booking.id())
         ) {
             model.addAttribute("error", "Kunde inte ta bort bokningen. Försök igen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
-            populateProfile(model, user);
-            return "profile";
+//            populateProfile(model, user);
+            return "redirect:/profile";
         }
 
         return "redirect:/profile";
@@ -139,47 +135,26 @@ public class ProfileController {
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                 @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
                                 Model model) {
-        Booking booking = bookingService.findById(bookingId).orElse(null);
-        User user = (User) session.getAttribute("user");
-        if (booking == null || user == null || !user.getName().equals(booking.getUser().getName())) {
-            System.err.println("Kaffe i servern: " + bookingId);
-            return "redirect:/login";
+        UserDto user = (UserDto) session.getAttribute("user");
+
+        final var result = bookingService.updateBooking(user, bookingId, start, end);
+        if (!result.equals(BookingStatus.SUCCESS)) {
+            model.addAttribute("error", result.getMessage());
+            System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId + "Fel: " + result.getMessage());
+            return "redirect:/profile";
         }
-
-        if (start.after(end)) {
-            model.addAttribute("error", "Startdatum måste vara före slutdatum.");
-            populateProfile(model, user);
-            return "profile";
-        }
-
-        if (start.before(DateUtil.nDaysInFuture(-1))) {
-            model.addAttribute("error", "Startdatum måste vara idag eller i framtiden");
-            populateProfile(model, user);
-            return "profile";
-        }
-
-        booking.setStartDate(start);
-        booking.setEndDate(end);
-
-        if (!bookingService.updateBooking(booking.getId(), booking)) {
-            model.addAttribute("error", "Kunde inte uppdatera bokningen.");
-            System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId);
-            populateProfile(model, user);
-            return "profile";
-        }
-
         return "redirect:/profile";
     }
 
-    private void populateProfile(Model model, User user) {
+    private void populateProfile(Model model, UserDto user) {
         model.addAttribute("userDetailsLabel", "Dina uppgifter");
         model.addAttribute("nameLabel", "Namn: ");
         model.addAttribute("emailLabel", "Mailadress: ");
-        model.addAttribute("nameValue", user.getName());
-        model.addAttribute("emailValue", user.getEmail());
-        List<Booking> bookings = bookingService.findBookingByUser(user);
-        model.addAttribute("bookings", bookings);
-        List<Room> rooms = bookings.stream().map(Booking::getRoom).toList();
+        model.addAttribute("nameValue", user.name());
+        model.addAttribute("emailValue", user.email());
+        List<BookingDto> bookingsDto = bookingService.findBookingByUser(user);
+        model.addAttribute("bookingsDto", bookingsDto);
+        List<RoomDto> rooms = bookingsDto.stream().map(BookingDto::room).toList();
         model.addAttribute("rooms", rooms);
     }
 }

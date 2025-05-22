@@ -3,8 +3,7 @@ package org.example.hotellkantarell.controller;
 import jakarta.servlet.http.HttpSession;
 import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
-import org.example.hotellkantarell.model.User;
-import org.example.hotellkantarell.repository.UserRepository;
+import org.example.hotellkantarell.dto.UserDto;
 import org.example.hotellkantarell.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +28,7 @@ public class UserController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute RegisterRequest registerRequest, RedirectAttributes redirectAttributes, Model model) {
-        User user = userService.register(registerRequest);
+        UserDto user = userService.register(registerRequest);
         if (user == null) {
             model.addAttribute("error", "Det finns redan ett konto med den emailen eller så är det kaffe i servern.");
             return "register";
@@ -46,10 +45,10 @@ public class UserController {
 
     @PostMapping("/login")
     public String loginUser(@ModelAttribute LoginRequest loginRequest, RedirectAttributes redirectAttributes, HttpSession session) {
-        User user = userService.login(loginRequest);
+        UserDto user = userService.login(loginRequest);
         if (user != null) {
             session.setAttribute("user", user);
-            redirectAttributes.addFlashAttribute("success", "Välkommen " + user.getName() + "!");
+            redirectAttributes.addFlashAttribute("success", "Välkommen " + user.name() + "!");
             return "redirect:/start";
         }
         redirectAttributes.addFlashAttribute("error", "Fel användarnamn eller lösenord");

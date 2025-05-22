@@ -1,8 +1,12 @@
 package org.example.hotellkantarell.service;
 
+import org.example.hotellkantarell.dto.BookingDto;
+import org.example.hotellkantarell.dto.RoomDto;
+import org.example.hotellkantarell.dto.UserDto;
+import org.example.hotellkantarell.status.BookingStatus;
+import org.example.hotellkantarell.mapper.BookingMapper;
+import org.example.hotellkantarell.mapper.RoomMapper;
 import org.example.hotellkantarell.model.Booking;
-import org.example.hotellkantarell.model.Room;
-import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
 import org.springframework.stereotype.Service;
@@ -10,24 +14,29 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+import static org.example.hotellkantarell.status.BookingStatus.*;
 
 @Service
 public class BookingService {
 
     private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
+    private final BookingMapper bookingMapper;
+    private final RoomMapper roomMapper;
 
-    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository) {
+    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
+        this.bookingMapper = bookingMapper;
+        this.roomMapper = roomMapper;
     }
 
-    public List<Booking> findBookingByUser(User user) {
-        return bookingRepository.findByUserId(user.getId())
-                .stream()
-                .sorted(Comparator.comparing(Booking::getStartDate))
-                .collect(Collectors.toList());
+    public List<BookingDto> findBookingByUser(UserDto user) {
+        List<BookingDto> bookings = new ArrayList<>();
+        bookingRepository.findByUserId(user.id()).forEach(
+                e -> bookings.add(bookingMapper.bookingToDto(e))
+        );
+        return bookings;
     }
 
     private Date setTime(Date date, int hour) {
@@ -40,36 +49,36 @@ public class BookingService {
         return calendar.getTime();
     }
 
-    public boolean createBooking(Booking booking) {
-        booking.setStartDate(setTime(booking.getStartDate(), 16));
-        booking.setEndDate(setTime(booking.getEndDate(), 12));
-
+    public boolean createBooking(BookingDto booking) {
+        Booking newBooking = bookingMapper.dtoToBooking(booking);
+        newBooking.setStartDate(setTime(booking.startDate(), 16));
+        newBooking.setEndDate(setTime(booking.endDate(), 12));
         Date now = new Date();
-        if (booking.getStartDate().before(now)) {
+        if (newBooking.getStartDate().before(now)) {
             return false;
         }
 
-        if (booking.getStartDate().after(booking.getEndDate()) || isRoomDoubleBooked(booking)) {
+        if (newBooking.getStartDate().after(booking.endDate()) || isRoomDoubleBooked(newBooking)) {
             return false;
         }
 
-        bookingRepository.save(booking);
+        bookingRepository.save(bookingMapper.dtoToBooking(booking));
         return true;
     }
 
-    public List<Room> findAvailableRooms(Date startDate, Date endDate, int guests) {
+    public List<RoomDto> findAvailableRooms(Date startDate, Date endDate, int guests) {
         Date start = setTime(startDate, 16);
         Date end = setTime(endDate, 12);
 
-        List<Room> allRooms = roomRepository.findAll();
+        List<RoomDto> allRooms = roomRepository.findAll().stream().map(roomMapper::roomToDto).toList();
 
         return allRooms.stream()
                 .filter(room -> {
-                    int capacity = room.getBeds() + room.getExtraBeds();
+                    int capacity = room.beds() + room.extraBeds();
                     return guests <= capacity;
                 })
                 .filter(room -> {
-                    List<Booking> bookings = bookingRepository.findByRoomId(room.getId());
+                    List<Booking> bookings = bookingRepository.findByRoomId(room.id());
                     for (Booking booking : bookings) {
                         if (!(end.compareTo(booking.getStartDate()) <= 0 || start.compareTo(booking.getEndDate()) >= 0)) {
                             return false;
@@ -80,26 +89,31 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-    public boolean updateBooking(Long id, Booking booking) {
-        booking.setStartDate(setTime(booking.getStartDate(), 16));
-        booking.setEndDate(setTime(booking.getEndDate(), 12));
-
-        Date now = new Date();
-        if (booking.getStartDate().before(now)) {
-            return false;
+    public BookingStatus updateBooking(UserDto user, Long id, Date start, Date end) {
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (start.before(new Date())) {
+            return EXPIRED_DATE;
         }
-
-        Booking existing = bookingRepository.findById(id).orElse(null);
-        if (
-                existing == null ||
-                booking.getStartDate().after(booking.getEndDate()) ||
-                isRoomDoubleBooked(booking)) {
-            return false;
+        if (start.after(end)) {
+            return REVERSE_DATE;
         }
+        if (booking == null) {
+            return NO_SUCH_BOOKING;
+        }
+        if (user == null) {
+            return MALFORMED_BOOKING_USER;
+        }
+        if (!Objects.equals(booking.getUser().getId(), user.id())) {
+            return ILLEGAL_ACCESS;
+        }
+        if (isRoomDoubleBooked(booking)) {
+            return DOUBLE_BOOKED;
+        }
+        booking.setStartDate(setTime(start, 16));
+        booking.setEndDate(setTime(end, 12));
 
-        booking.setId(id);
         bookingRepository.save(booking);
-        return true;
+        return SUCCESS;
     }
 
     public boolean deleteBooking(Long id) {
@@ -121,7 +135,8 @@ public class BookingService {
                 );
     }
 
-    public Optional<Booking> findById(Long id) {
-        return bookingRepository.findById(id);
+    public BookingDto findById(Long id) {
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        return booking != null ? bookingMapper.bookingToDto(booking) : null;
     }
 }
