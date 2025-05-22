@@ -62,10 +62,8 @@ public class BookingPageController {
             model.addAttribute("error", "Kunde inte genomföra bokningen. " +
                     "Se till att startdatumet är innan slutdatum och inte i dåtiden.");
         } else {
-            model.addAttribute("success", "Bokningen tillagd, ha så kult på restaurangen.");
+            model.addAttribute("success", "Bokningen lyckades. Gå till din profil för att se dina aktuella bokningar.");
         }
         return "start";
     }
-
-
 }
