@@ -32,10 +32,11 @@ public class BookingService {
     }
 
     public List<BookingDto> findBookingByUser(UserDto user) {
-        List<BookingDto> bookings = new ArrayList<>();
-        bookingRepository.findByUserId(user.id()).forEach(
-                e -> bookings.add(bookingMapper.bookingToDto(e))
-        );
+        List<BookingDto> bookings = bookingRepository.findByUserId(user.id()).stream()
+                .map(bookingMapper::bookingToDto)
+                .sorted(Comparator.comparing(BookingDto::startDate))
+                .collect(Collectors.toList());
+
         return bookings;
     }
 
