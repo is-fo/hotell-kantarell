@@ -12,30 +12,24 @@
     </form>
   <p>Välkommen till Hotell Kantarell!</p>
   <form method="get" action="/start">
-  <label for="start">Inckeckning:</label>
+  <label for="start">Incheckning:</label>
   <input type="date" id="start" name="start">
 
   <label for="end">Utcheckning:</label>
   <input type="date" id="end" name="end">
-
       <p>Antal personer</p>
-
       <label>
           <input type="radio" name="guests" value="1" required> 1
       </label>
-
       <label>
           <input type="radio" name="guests" value="2"> 2
       </label>
-
       <label>
           <input type="radio" name="guests" value="3"> 3
       </label>
-
       <label>
           <input type="radio" name="guests" value="4"> 4
       </label><br>
-
       <button type="submit">Skicka</button>
   </form>
   <div th:if="${results != null}">

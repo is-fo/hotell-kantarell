@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asar&family=Bona+Nova+SC:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/script/script.js" defer></script>
+
 </head>
 <body>
     <div class="notification-popup error" th:if="${error}">
@@ -15,13 +19,20 @@
         <span th:text="${success}"></span>
         <button class="close-notification">×</button>
     </div>
-    <form action="/login" method="post">
-        <input type="text" name="email" placeholder="Email" />
-        <input type="password" name="rawPassword" placeholder="Password" />
-        <button type="submit">Login</button>
-    </form>
-    <form action="/register" method="get">
-        <button type="submit">Skapa konto</button>
-    </form>
+    <div class="background-container">
+        <div class="login-container">
+            <form action="/login" method="post">
+                <input type="text" name="email" placeholder="Email" />
+                <input type="password" name="rawPassword" placeholder="Lösenord" />
+                <button type="submit">Logga in</button>
+            </form>
+            <form action="/register" method="get" class="goto-register">
+                <div>
+                    <span>Har du inget konto?</span>
+                    <button type="submit">Skapa konto</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

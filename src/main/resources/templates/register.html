@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asar&family=Bona+Nova+SC:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/script/script.js" defer></script>
 </head>
@@ -15,14 +18,21 @@
         <span th:text="${success}"></span>
         <button class="close-notification">×</button>
     </div>
-    <form action="/register" method="post">
-        <input type="text" name="name" placeholder="Full Name">
-        <input type="text" name="email" placeholder="Email" />
-        <input type="password" name="rawPassword" placeholder="Password" />
-        <button type="submit">Register</button>
-    </form>
-    <form action="/login" method="get">
-        <button type="submit">Tillbaka till startsidan</button>
-    </form>
+    <div class="background-container">
+        <div class="login-container">
+            <form action="/register" method="post">
+                <input type="text" name="name" placeholder="Namn" />
+                <input type="text" name="email" placeholder="Email" />
+                <input type="password" name="rawPassword" placeholder="Lösenord" />
+                <button type="submit">Registrera</button>
+            </form>
+            <form action="/login" method="get" class="goto-register">
+                <div>
+                    <span>Har du redan ett konto?</span>
+                    <button type="submit">Logga in</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
