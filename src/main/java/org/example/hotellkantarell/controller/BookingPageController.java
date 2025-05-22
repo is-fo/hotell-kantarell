@@ -58,7 +58,6 @@ public class BookingPageController {
         } else {
             redirectAttributes.addFlashAttribute("success", result.getMessage());
             return "redirect:/profile";
-            model.addAttribute("success", "Bokningen lyckades. Gå till din profil för att se dina aktuella bokningar.");
         }
     }
 }
