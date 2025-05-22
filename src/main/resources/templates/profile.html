@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:inline="text">
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
@@ -37,6 +37,7 @@
                 Rum: <span th:text="|${bookingDto.room.beds} Sängar, ${bookingDto.room.extraBeds} extrasängar|"></span>,
                 Incheckning: <span th:text="${#dates.format(bookingDto.startDate, 'yyyy-MM-dd HH:mm')}"></span>,
                 Utcheckning: <span th:text="${#dates.format(bookingDto.endDate, 'yyyy-MM-dd HH:mm')}"></span>
+                Totalpris: <span th:text="|${bookingDto.totalPrice()} kr|"></span>
             </form>
             <form th:action="@{/profile/booking/delete}" method="post">
                 <input type="hidden" name="bookingId" th:value="${bookingDto.id}">

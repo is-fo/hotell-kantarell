@@ -13,7 +13,7 @@ public record BookingDto(
         Date endDate
 ) {
 
-    Long totalPrice() {
+    public Long totalPrice() {
         assert startDate != null;
         LocalDate start = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         assert endDate != null;
@@ -21,5 +21,4 @@ public record BookingDto(
         assert room != null;
         return room.pricePerNight() * ChronoUnit.DAYS.between(start, end);
     }
-
 }

@@ -44,7 +44,7 @@
           <li th:each="item : ${results}">
               <form th:action="@{/book}" method="post">
 
-                  Antal sängar: <span th:text="${item.beds}"></span>, extra sängar: <span th:text="${item.extraBeds}"></span>, Storlek <span th:text="${item.area}"></span> m²
+                  Rum: <span th:text="${item.roomNumber}"></span>, Antal sängar: <span th:text="${item.beds}"></span>, extra sängar: <span th:text="${item.extraBeds}"></span>, Storlek <span th:text="${item.area}">, Pris per natt: </span> m², Pris per natt: <span th:text="${item.pricePerNight}">kr</span> <img th:src="${item.imageUrl}" alt="Bild på rummet">
 
                   <input type="hidden" name="room.id" th:value="${item.id}" />
                   <input type="hidden" name="start" th:value="${#dates.format(start, 'yyyy-MM-dd')}" />
