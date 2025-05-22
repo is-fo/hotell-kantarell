@@ -1,6 +1,9 @@
 package org.example.hotellkantarell.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -19,7 +22,7 @@ public class User {
     Long id;
 
     @Pattern(regexp = "^[a-zA-ZåÅäÄöÖ '\\-]+$", message = "Ogiltigt namn")
-    @Size(min = 3, max =50, message = "At least 3 Characters for name")
+    @Size(min = 3, max = 50, message = "At least 3 Characters for name")
     String name;
 
     @Email
@@ -27,10 +30,6 @@ public class User {
 
     String passwordHash;
 
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
 
     public User(String name, String email, String passwordHash) {
         this.name = name;

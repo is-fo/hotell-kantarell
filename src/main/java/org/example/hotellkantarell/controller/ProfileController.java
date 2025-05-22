@@ -3,9 +3,9 @@ package org.example.hotellkantarell.controller;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.example.hotellkantarell.dto.*;
+import org.example.hotellkantarell.status.BookingStatus;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.UserService;
-import org.example.hotellkantarell.util.DateUtil;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -117,13 +117,13 @@ public class ProfileController {
             return "redirect:/login";
         } else if (
                 booking == null ||
-                !user.name().equals(booking.user().name()) ||
-                !bookingService.deleteBooking(booking.id())
+                        !user.name().equals(booking.user().name()) ||
+                        !bookingService.deleteBooking(booking.id())
         ) {
             model.addAttribute("error", "Kunde inte ta bort bokningen. Försök igen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
-            populateProfile(model, user);
-            return "profile";
+//            populateProfile(model, user);
+            return "redirect:/profile";
         }
 
         return "redirect:/profile";
@@ -137,12 +137,11 @@ public class ProfileController {
                                 Model model) {
         UserDto user = (UserDto) session.getAttribute("user");
 
-
-        if (!bookingService.updateBooking(bookingId, start, end)) {
-            model.addAttribute("error", "Kunde inte uppdatera bokningen.");
-            System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId);
-            populateProfile(model, user);
-            return "profile";
+        final var result = bookingService.updateBooking(user, bookingId, start, end);
+        if (!result.equals(BookingStatus.SUCCESS)) {
+            model.addAttribute("error", result.getMessage());
+            System.err.println("Uppdatering misslyckades för bokning med id: " + bookingId + "Fel: " + result.getMessage());
+            return "redirect:/profile";
         }
         return "redirect:/profile";
     }

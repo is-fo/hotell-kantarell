@@ -6,9 +6,6 @@ import org.example.hotellkantarell.dto.UserDto;
 import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.Room;
 import org.example.hotellkantarell.model.User;
-import org.example.hotellkantarell.repository.BookingRepository;
-import org.example.hotellkantarell.repository.RoomRepository;
-import org.example.hotellkantarell.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +31,7 @@ public class BookingMapper {
         Room room = roomMapper.dtoToRoom(bookingDto.room());
         User user = userMapper.dtoToUser(bookingDto.user());
 
-        return (bookingDto.id()!= null)
+        return (bookingDto.id() != null)
                 ? new Booking(bookingDto.id(), room, user, bookingDto.startDate(), bookingDto.endDate())
                 : new Booking(room, user, bookingDto.startDate(), bookingDto.endDate());
     }

@@ -77,7 +77,7 @@ public class UserService {
 
     public UserDto editPassword(UserDto userDto, @Valid @ModelAttribute EditPasswordRequest request) {
         User user = userMapper.dtoToUser(userDto);
-        if(request.rawPassword() != null) {
+        if (request.rawPassword() != null) {
             user.setPasswordHash(passwordEncoder.encode(request.rawPassword()));
         }
         return userMapper.userToDto(userRepository.save(user));

@@ -1,15 +1,12 @@
 package org.example.hotellkantarell.service;
 
-import jakarta.transaction.Transactional;
 import org.example.hotellkantarell.dto.BookingDto;
 import org.example.hotellkantarell.dto.RoomDto;
 import org.example.hotellkantarell.dto.UserDto;
+import org.example.hotellkantarell.status.BookingStatus;
 import org.example.hotellkantarell.mapper.BookingMapper;
 import org.example.hotellkantarell.mapper.RoomMapper;
-import org.example.hotellkantarell.mapper.UserMapper;
 import org.example.hotellkantarell.model.Booking;
-import org.example.hotellkantarell.model.Room;
-import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+import static org.example.hotellkantarell.status.BookingStatus.*;
 
 @Service
 public class BookingService {
@@ -26,14 +23,12 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final RoomMapper roomMapper;
-    private final UserMapper userMapper;
 
-    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper, UserMapper userMapper) {
+    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
         this.roomMapper = roomMapper;
-        this.userMapper = userMapper;
     }
 
     public List<BookingDto> findBookingByUser(UserDto user) {
@@ -67,7 +62,6 @@ public class BookingService {
             return false;
         }
 
-
         bookingRepository.save(bookingMapper.dtoToBooking(booking));
         return true;
     }
@@ -95,49 +89,31 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
-//    public boolean updateBooking(Long id, BookingDto bookingDto) {
-//
-//        if (bookingDto.startDate().before(new Date())) {
-//            return false;
-//        }
-//
-//        Booking existing = bookingRepository.findById(id).orElse(null);
-//        if (
-//                existing == null ||
-//                bookingDto.startDate().after(bookingDto.endDate()) ||
-//                isRoomDoubleBooked(bookingDto)) {
-//            return false;
-//        }
-//        existing.setStartDate(setTime(bookingDto.startDate(), 16));
-//        existing.setEndDate(setTime(bookingDto.endDate(), 12));
-//
-//        Room updatedRoom = roomMapper.dtoToRoom(bookingDto.room());
-//        User updatedUser = userMapper.dtoToUser(bookingDto.user());
-//
-//        existing.setRoom(updatedRoom);
-//        existing.setUser(updatedUser);
-//
-//        existing.setId(id);
-//        bookingRepository.save(existing);
-//        return true;
-//    }
-
-    public boolean updateBooking(Long id, Date start, Date end) {
+    public BookingStatus updateBooking(UserDto user, Long id, Date start, Date end) {
         Booking booking = bookingRepository.findById(id).orElse(null);
-        if (booking == null) {
-            return false;
-        }
         if (start.before(new Date())) {
-            return false;
+            return EXPIRED_DATE;
         }
         if (start.after(end)) {
-            return false;
+            return REVERSE_DATE;
+        }
+        if (booking == null) {
+            return NO_SUCH_BOOKING;
+        }
+        if (user == null) {
+            return MALFORMED_BOOKING_USER;
+        }
+        if (!Objects.equals(booking.getUser().getId(), user.id())) {
+            return ILLEGAL_ACCESS;
+        }
+        if (isRoomDoubleBooked(booking)) {
+            return DOUBLE_BOOKED;
         }
         booking.setStartDate(setTime(start, 16));
         booking.setEndDate(setTime(end, 12));
 
         bookingRepository.save(booking);
-        return true;
+        return SUCCESS;
     }
 
     public boolean deleteBooking(Long id) {

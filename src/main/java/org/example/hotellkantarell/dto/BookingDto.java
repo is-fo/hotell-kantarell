@@ -1,7 +1,5 @@
 package org.example.hotellkantarell.dto;
 
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -15,7 +13,7 @@ public record BookingDto(
         Date endDate
 ) {
 
-    Long setTotalPrice() {
+    Long totalPrice() {
         assert startDate != null;
         LocalDate start = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         assert endDate != null;

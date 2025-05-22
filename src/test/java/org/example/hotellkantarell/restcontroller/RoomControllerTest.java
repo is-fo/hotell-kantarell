@@ -40,7 +40,7 @@ public class RoomControllerTest {
         List<Room> result = roomController.getAllRooms();
 
         assertEquals(1, result.size());
-        assertEquals(2, result.get(0).getBeds());
+        assertEquals(2, result.getFirst().getBeds());
     }
 
     @Test

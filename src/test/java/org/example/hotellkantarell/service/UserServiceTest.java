@@ -4,7 +4,6 @@ import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
 import org.example.hotellkantarell.dto.UserDto;
 import org.example.hotellkantarell.mapper.UserMapper;
-import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.UserRepository;
@@ -15,12 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
