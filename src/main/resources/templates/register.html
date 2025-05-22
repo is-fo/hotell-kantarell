@@ -18,20 +18,22 @@
         <span th:text="${success}"></span>
         <button class="close-notification">×</button>
     </div>
+    <div class="start-page">
     <div class="background-container">
-        <div class="login-container">
-            <form action="/register" method="post">
-                <input type="text" name="name" placeholder="Namn" />
-                <input type="text" name="email" placeholder="Email" />
-                <input type="password" name="rawPassword" placeholder="Lösenord" />
-                <button type="submit">Registrera</button>
-            </form>
-            <form action="/login" method="get" class="goto-register">
-                <div>
-                    <span>Har du redan ett konto?</span>
-                    <button type="submit">Logga in</button>
-                </div>
-            </form>
+            <div class="login-container">
+                <form action="/register" method="post">
+                    <input type="text" name="name" placeholder="Namn" />
+                    <input type="text" name="email" placeholder="Email" />
+                    <input type="password" name="rawPassword" placeholder="Lösenord" />
+                    <button type="submit">Registrera</button>
+                </form>
+                <form action="/login" method="get" class="goto-register">
+                    <div>
+                        <span>Har du redan ett konto?</span>
+                        <button type="submit">Logga in</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </body>

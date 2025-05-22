@@ -19,19 +19,21 @@
         <span th:text="${success}"></span>
         <button class="close-notification">×</button>
     </div>
-    <div class="background-container">
-        <div class="login-container">
-            <form action="/login" method="post">
-                <input type="text" name="email" placeholder="Email" />
-                <input type="password" name="rawPassword" placeholder="Lösenord" />
-                <button type="submit">Logga in</button>
-            </form>
-            <form action="/register" method="get" class="goto-register">
-                <div>
-                    <span>Har du inget konto?</span>
-                    <button type="submit">Skapa konto</button>
-                </div>
-            </form>
+    <div class="start-page">
+        <div class="background-container">
+            <div class="login-container">
+                <form action="/login" method="post">
+                    <input type="text" name="email" placeholder="Email" />
+                    <input type="password" name="rawPassword" placeholder="Lösenord" />
+                    <button type="submit">Logga in</button>
+                </form>
+                <form action="/register" method="get" class="goto-register">
+                    <div>
+                        <span>Har du inget konto?</span>
+                        <button type="submit">Skapa konto</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </body>

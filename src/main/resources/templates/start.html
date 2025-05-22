@@ -3,55 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <title>Start</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asar&family=Bona+Nova+SC:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/script/script.js" defer></script>
 </head>
 <body>
+<div class="navigation-bar">
     <form action="/profile" method="get">
         <button type="submit">Visa profil</button>
     </form>
-  <p>Välkommen till Hotell Kantarell!</p>
-  <form method="get" action="/start">
-  <label for="start">Incheckning:</label>
-  <input type="date" id="start" name="start">
+</div>
+<div class="start-page">
+    <div class="filter-container">
+        <form method="get" action="/start">
+            <label for="start">Incheckning:</label>
+            <input type="date" id="start" name="start">
 
-  <label for="end">Utcheckning:</label>
-  <input type="date" id="end" name="end">
-      <p>Antal personer</p>
-      <label>
-          <input type="radio" name="guests" value="1" required> 1
-      </label>
-      <label>
-          <input type="radio" name="guests" value="2"> 2
-      </label>
-      <label>
-          <input type="radio" name="guests" value="3"> 3
-      </label>
-      <label>
-          <input type="radio" name="guests" value="4"> 4
-      </label><br>
-      <button type="submit">Skicka</button>
-  </form>
-  <div th:if="${results != null}">
-      <h2>Tillgängliga rum</h2>
-      <ul>
-          <li th:each="item : ${results}">
-              <form th:action="@{/book}" method="post">
+            <label for="end">Utcheckning:</label>
+            <input type="date" id="end" name="end">
 
-                  Rum: <span th:text="${item.roomNumber}"></span>, Antal sängar: <span th:text="${item.beds}"></span>, extra sängar: <span th:text="${item.extraBeds}"></span>, Storlek <span th:text="${item.area}">, Pris per natt: </span> m², Pris per natt: <span th:text="${item.pricePerNight}">kr</span> <img th:src="${item.imageUrl}" alt="Bild på rummet">
+            <p>Antal personer</p>
+            <label><input type="radio" name="guests" value="1" required> 1</label>
+            <label><input type="radio" name="guests" value="2"> 2</label>
+            <label><input type="radio" name="guests" value="3"> 3</label>
+            <label><input type="radio" name="guests" value="4"> 4</label>
 
-                  <input type="hidden" name="room.id" th:value="${item.id}" />
-                  <input type="hidden" name="start" th:value="${#dates.format(start, 'yyyy-MM-dd')}" />
-                  <input type="hidden" name="end" th:value="${#dates.format(end, 'yyyy-MM-dd')}" />
-                  <button type="submit">Boka</button>
-              </form>
-          </li>
-      </ul>
-  </div>
+            <br>
+            <button type="submit">Skicka</button>
+        </form>
+    </div>
+
+    <div class="bookings-container" th:if="${results != null}">
+        <h2>Tillgängliga rum</h2>
+        <ul class="bookings-grid">
+            <li class="bookings-list" th:each="item, iterStat : ${results}">
+                <div class="bookings-columns">
+                    <div class="booking-info">
+                        <div class="col">
+                            <span>Rum: </span><span th:text="${item.roomNumber}"></span><br>
+                            <span>Antal sängar: </span><span th:text="${item.beds}"></span><br>
+                            <span>Extra sängar: </span><span th:text="${item.extraBeds}"></span>
+                        </div>
+                        <div class="col">
+                            <span>Storlek: </span><span th:text="${item.area} + 'm²'"></span><br>
+                            <span>Pris per natt: </span><span th:text="${item.pricePerNight} + ' kr'"></span><br>
+                            <span>Wifi: </span><span th:text="Ja"></span>
+                        </div>
+                    </div>
+                    <div class="booking-media">
+                        <img th:src="${item.imageUrl}" alt="Bild på rummet" width="200px" height="auto">
+                        <form th:action="@{/book}" method="post">
+                            <input type="hidden" name="room.id" th:value="${item.id}" />
+                            <input type="hidden" name="start" th:value="${#dates.format(start, 'yyyy-MM-dd')}" />
+                            <input type="hidden" name="end" th:value="${#dates.format(end, 'yyyy-MM-dd')}" />
+                            <button type="submit">Boka</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
 <div class="notification-popup error" th:if="${error}">
     <span th:text="${error}"></span>
     <button class="close-notification">×</button>
 </div>
+
 <div class="notification-popup success" th:if="${success}">
     <span th:text="${success}"></span>
     <button class="close-notification">×</button>
