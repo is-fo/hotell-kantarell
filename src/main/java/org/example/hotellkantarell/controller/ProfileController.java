@@ -122,7 +122,6 @@ public class ProfileController {
         ) {
             model.addAttribute("error", "Kunde inte ta bort bokningen. Försök igen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
-//            populateProfile(model, user);
             return "redirect:/profile";
         }
 

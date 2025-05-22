@@ -63,7 +63,7 @@ public class UserService {
     }
 
     public UserDto editProfile(UserDto userDto, @Valid @ModelAttribute EditProfileRequest request) {
-        User user = userMapper.dtoToUser(userDto);
+        User user = userRepository.findById(userDto.id()).get();
         if (request.name() != null) {
             user.setName(request.name());
         }
