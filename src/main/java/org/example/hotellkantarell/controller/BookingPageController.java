@@ -1,10 +1,8 @@
 package org.example.hotellkantarell.controller;
 
 import jakarta.servlet.http.HttpSession;
-import org.example.hotellkantarell.dto.BookingDto;
 import org.example.hotellkantarell.dto.RoomDto;
 import org.example.hotellkantarell.dto.UserDto;
-import org.example.hotellkantarell.repository.RoomRepository;
 import org.example.hotellkantarell.service.BookingService;
 import org.example.hotellkantarell.service.RoomService;
 import org.example.hotellkantarell.status.BookingStatus;
@@ -15,13 +13,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
-import static org.example.hotellkantarell.status.BookingStatus.EXPIRED_DATE;
-import static org.example.hotellkantarell.status.BookingStatus.REVERSE_DATE;
 
 @Controller
 public class BookingPageController {
@@ -40,7 +37,13 @@ public class BookingPageController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
             @RequestParam(required = false) Integer guests,
             Model model) {
-        if (start != null && end != null && guests != null) {
+
+
+        if (!bookingService.validDates(start, end)) {
+            model.addAttribute("error", "Ogiltigt datum, försök igen.");
+        }
+
+        if (start != null && end != null && guests != null && bookingService.validDates(start, end)) {
             List<RoomDto> results = bookingService.findAvailableRooms(start, end, guests);
             model.addAttribute("results", results);
             model.addAttribute("start", start);
