@@ -22,9 +22,9 @@
     <div class="background-container">
             <div class="login-container">
                 <form action="/register" method="post">
-                    <input type="text" name="name" placeholder="Namn" />
-                    <input type="text" name="email" placeholder="Email" />
-                    <input type="password" name="rawPassword" placeholder="Lösenord" />
+                    <input type="text" name="name" placeholder="Namn" required/>
+                    <input type="text" name="email" placeholder="Email" required/>
+                    <input type="password" name="rawPassword" placeholder="Lösenord" required/>
                     <button type="submit">Registrera</button>
                 </form>
                 <form action="/login" method="get" class="goto-register">
