@@ -58,7 +58,7 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/user/update")
-    public String editProfile(@ModelAttribute @Valid EditProfileRequest editProfileRequest, BindingResult result, HttpSession session, Model model) {
+    public String editProfile(@ModelAttribute @Valid EditProfileRequest editProfileRequest, BindingResult result, HttpSession session, RedirectAttributes redirectAttributes, Model model) {
 
         UserDto currentUser = (UserDto) session.getAttribute("user");
         if (currentUser == null) {
@@ -71,8 +71,7 @@ public class ProfileController {
             return "editprofile";
         }
 
-        UserDto updated = userService.editProfile(currentUser, editProfileRequest);
-        session.setAttribute("user", updated);
+        userService.editProfile(currentUser, editProfileRequest, redirectAttributes, session);
 
         return "redirect:/profile";
     }
