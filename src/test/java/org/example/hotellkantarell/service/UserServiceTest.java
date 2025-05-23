@@ -151,14 +151,18 @@ class UserServiceTest {
 
         EditProfileRequest request = new EditProfileRequest("New Name", "new@example.com");
 
+        RedirectAttributes redirectAttributes = mock(RedirectAttributes.class);
+        HttpSession session = mock(HttpSession.class);
+
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
         when(userRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(userMapper.userToDto(any())).thenReturn(new UserDto(1L, "New Name", "new@example.com"));
 
-        UserDto updated = userService.editProfile(userDto, request);
+        boolean result = userService.editProfile(userDto, request, redirectAttributes, session);
 
-        assertEquals("New Name", updated.name());
-        assertEquals("new@example.com", updated.email());
+        assertTrue(result);
+        verify(session).setAttribute(eq("user"), any(UserDto.class));
+        verify(redirectAttributes).addFlashAttribute("success", "Användaruppgifter uppdaterade.");
     }
 
     @Test
