@@ -78,15 +78,13 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/user/updatepassword")
-    public String updatePassword(@ModelAttribute @Valid EditPasswordRequest editPasswordRequest, HttpSession session) {
+    public String updatePassword(@ModelAttribute EditPasswordRequest editPasswordRequest, RedirectAttributes redirectAttributes, HttpSession session) {
         UserDto currentUser = (UserDto) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
         }
 
-        UserDto updated = userService.editPassword(currentUser, editPasswordRequest);
-        session.setAttribute("user", updated);
-
+        userService.editPassword(currentUser, editPasswordRequest, redirectAttributes, session);
         return "redirect:/profile";
     }
 
@@ -101,13 +99,17 @@ public class ProfileController {
     }
 
     @PostMapping("/profile/user/delete")
-    public String deleteUser(HttpSession session) {
+    public String deleteUser(HttpSession session, RedirectAttributes redirectAttributes) {
         UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
-        session.invalidate();
-        return userService.deleteUser(user) ? "redirect:/register" : "redirect:/profile";
+        if (userService.deleteUser(user, session)) {
+            return "redirect:/register";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Du får inte ta bort ditt konto om du har aktiva bokningar.");
+            return "redirect:/profile";
+        }
     }
 
     @PostMapping("/profile/booking/delete")

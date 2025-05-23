@@ -1,5 +1,6 @@
 package org.example.hotellkantarell.service;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.example.hotellkantarell.dto.*;
 import org.example.hotellkantarell.mapper.UserMapper;
@@ -10,6 +11,7 @@ import org.example.hotellkantarell.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +52,7 @@ public class UserService {
     }
 
 
-    public boolean deleteUser(UserDto userDto) {
+    public boolean deleteUser(UserDto userDto, HttpSession session) {
 
         Optional<User> exists = userRepository.findById(userDto.id());
         List<Booking> bookings = bookingRepository.findByUserId(userDto.id());
@@ -59,6 +61,7 @@ public class UserService {
         }
 
         userRepository.delete(exists.get());
+        session.invalidate();
         return true;
     }
 
@@ -75,12 +78,17 @@ public class UserService {
         return userMapper.userToDto(userRepository.save(user));
     }
 
-    public UserDto editPassword(UserDto userDto, @Valid @ModelAttribute EditPasswordRequest request) {
+    public boolean editPassword(UserDto userDto, @ModelAttribute EditPasswordRequest request, RedirectAttributes redirectAttributes, HttpSession session) {
         User user = userMapper.dtoToUser(userDto);
-        if (request.rawPassword() != null) {
+        if (request.rawPassword() != null && request.rawPassword().length() > 5) {
             user.setPasswordHash(passwordEncoder.encode(request.rawPassword()));
+            session.setAttribute("user", userMapper.userToDto(userRepository.save(user)));
+            redirectAttributes.addFlashAttribute("success", "Ändrade lösenordet!");
+            return true;
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Lösenordet måste vara minst 6 karaktärer.");
+            return false;
         }
-        return userMapper.userToDto(userRepository.save(user));
     }
 
 }
