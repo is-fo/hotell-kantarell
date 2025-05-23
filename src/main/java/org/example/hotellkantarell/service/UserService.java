@@ -72,17 +72,27 @@ public class UserService {
         return true;
     }
 
-    public UserDto editProfile(UserDto userDto, @Valid @ModelAttribute EditProfileRequest request) {
-        User user = userRepository.findById(userDto.id()).get();
-        if (request.name() != null) {
+    public boolean editProfile(UserDto userDto, @Valid @ModelAttribute EditProfileRequest request, RedirectAttributes redirectAttributes, HttpSession session) {
+        User user = userRepository.findById(userDto.id()).orElse(null);
+        if (user == null) {
+            throw new NullPointerException();
+        }
+        if (request.name() != null && !request.name().isBlank()) {
             user.setName(request.name());
         }
 
-        if (request.email() != null) {
-            user.setEmail(request.email());
+        if (request.email() != null && !request.email().isBlank()) {
+            if (userRepository.findByEmail(request.email()) == null) {
+                user.setEmail(request.email());
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Den angivna mailadressen är upptagen.");
+                return false;
+            }
         }
+        session.setAttribute("user", userMapper.userToDto(user));
+        redirectAttributes.addFlashAttribute("success", "Användaruppgifter uppdaterade.");
 
-        return userMapper.userToDto(userRepository.save(user));
+        return true;
     }
 
     public boolean editPassword(UserDto userDto, @ModelAttribute EditPasswordRequest request, RedirectAttributes redirectAttributes, HttpSession session) {
