@@ -8,6 +8,7 @@ import org.example.hotellkantarell.model.Booking;
 import org.example.hotellkantarell.model.User;
 import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.UserRepository;
+import org.example.hotellkantarell.status.RegisterStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,16 +32,22 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    public UserDto register(RegisterRequest registerRequest) {
+    public RegisterStatus register(RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.email()) != null) {
-            return null;
-        }
-
-        return userMapper.userToDto(userRepository.save(new User(
+            return RegisterStatus.EMAIL_IN_USE;
+        }else if (registerRequest.name() == null || registerRequest.name().isEmpty()) {
+            return RegisterStatus.MISSING_NAME;
+        } else if (registerRequest.email() == null || registerRequest.email().isEmpty()) {
+            return RegisterStatus.MISSING_EMAIL;
+        } else if(registerRequest.rawPassword() == null || registerRequest.rawPassword().isEmpty()) {
+            return RegisterStatus.MISSING_PASSWORD;
+        } else{
+        userRepository.save(new User(
                 registerRequest.name(),
                 registerRequest.email(),
-                passwordEncoder.encode(registerRequest.rawPassword())
-        )));
+                passwordEncoder.encode(registerRequest.rawPassword())));
+        return RegisterStatus.SUCCESS;
+        }
     }
 
     public UserDto login(LoginRequest loginRequest) {
