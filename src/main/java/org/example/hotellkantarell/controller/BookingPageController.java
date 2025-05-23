@@ -48,6 +48,9 @@ public class BookingPageController {
             model.addAttribute("results", results);
             model.addAttribute("start", start);
             model.addAttribute("end", end);
+            if(results.isEmpty()){
+                model.addAttribute("error", "Alla rum är tyvärr bokade.");
+            }
         }
         return "start";
     }
