@@ -116,6 +116,12 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id).orElse(null);
         start = setTime(start, 16);
         end = setTime(end, 12);
+
+        if(booking != null) {
+            booking.setStartDate(start);
+            booking.setEndDate(end);
+        }
+
         if (start.before(new Date())) {
             return EXPIRED_DATE;
         }
@@ -134,8 +140,7 @@ public class BookingService {
         if (isRoomDoubleBooked(booking)) {
             return DOUBLE_BOOKED;
         }
-        booking.setStartDate(start);
-        booking.setEndDate(end);
+
 
         bookingRepository.save(booking);
         return SUCCESS;
@@ -167,14 +172,14 @@ public class BookingService {
 
     public boolean validDates(Date start, Date end) {
 
-        LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.of(1, 0);
-        Date today = Date.from(date.atTime(time).atZone(ZoneId.systemDefault()).toInstant());
+        Date today = Date.from(LocalDate.now()
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant());
 
         boolean validDates = true;
 
         if (start != null && end != null) {
-            if (start.after(end) || start.before(today)) {
+            if (start.after(end) || start.before(today) || end.equals(start)) {
                 validDates = false;
             }
         }

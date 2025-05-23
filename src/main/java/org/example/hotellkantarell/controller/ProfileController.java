@@ -147,7 +147,6 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("success", result.getMessage());
         }
         return "redirect:/profile";
-
     }
 
     private void populateProfile(Model model, UserDto user) {
