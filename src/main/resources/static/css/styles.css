@@ -7,6 +7,7 @@
     --soft-amber: rgb(240, 210, 150);
     --forest-shadow: rgb(40, 40, 30);
     --pale-sand: rgb(220, 210, 190);
+    --pale-sand-rgba: rgb(220, 210, 190, 0.6);
     --mist-grey: rgb(190, 190, 180);
 
     --background-no-text: url("https://i.imgur.com/6MbOryH.jpeg");
@@ -231,12 +232,24 @@ span {
     display: flex;
     flex-direction: column;
     background-image: var(--background-no-text);
+}
 
+.background {
+    background-color: var(--pale-sand-rgba);
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 0.5rem;
 }
 
 .bookings-columns {
     display: flex;
     gap: 2rem;
+}
+
+.col {
+    height: max-content;
+    width: auto;
 }
 
 .col span:nth-of-type(odd) {
@@ -267,3 +280,27 @@ span {
     width: 100%;
 }
 
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: var(--pale-sand-rgba);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--earthy-olive);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+}
+
+.close {
+    float: right;
+    cursor: pointer;
+}
