@@ -14,6 +14,9 @@ import org.example.hotellkantarell.repository.BookingRepository;
 import org.example.hotellkantarell.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -161,4 +164,22 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id).orElse(null);
         return booking != null ? bookingMapper.bookingToDto(booking) : null;
     }
+
+    public boolean validDates(Date start, Date end) {
+
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.of(1, 0);
+        Date today = Date.from(date.atTime(time).atZone(ZoneId.systemDefault()).toInstant());
+
+        boolean validDates = true;
+
+        if (start != null && end != null) {
+            if (start.after(end) || start.before(today)) {
+                validDates = false;
+            }
+        }
+        return validDates;
+    }
+
+
 }

@@ -14,9 +14,9 @@
   <form method="get" action="/start">
   <label for="start">Startdatum:</label>
   <input type="date" id="start" name="start">
-
   <label for="end">Slutdatum:</label>
   <input type="date" id="end" name="end">
+
 
       <p>Antal personer</p>
 
@@ -37,6 +37,10 @@
       </label><br>
 
       <button type="submit">Skicka</button>
+      <div class="notification-popup error" th:if="${error}">
+          <span th:text="${error}"></span>
+          <button class="close-notification">×</button>
+      </div>
   </form>
   <div th:if="${results != null}">
       <h2>Tillgängliga rum</h2>
