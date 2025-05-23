@@ -18,52 +18,74 @@
     <form th:action="@{/profile/user/updatepassword}" method="get">
         <button type="submit">Ändra lösenord</button>
     </form>
+    <form action="/profile/user/delete" method="POST" >
+        <button type="submit">Radera konto</button>
+    </form>
 </div>
 
-    <div class="notification-popup error" th:if="${error != null}">
-        <span th:text="${error}"></span>
-        <button class="close-notification">×</button>
-    </div>
-    <div class="notification-popup success" th:if="${session.success}">
-        <span th:text="${session.success}"></span>
-        <button class="close-notification">×</button>
-    </div>
-<br>
-<div th:if="${bookingsDto != null}">
+<div class="bookings-container" th:if="${bookingsDto != null}">
     <h2>Dina bokningar</h2>
-    <ul>
-        <li th:each="bookingDto : ${bookingsDto}">
-            <form th:action="@{/profile}" method="get">
-                Rum: <span th:text="|${bookingDto.room.beds} Sängar, ${bookingDto.room.extraBeds} extrasängar|"></span>,
-                Incheckning: <span th:text="${#dates.format(bookingDto.startDate, 'yyyy-MM-dd HH:mm')}"></span>,
-                Utcheckning: <span th:text="${#dates.format(bookingDto.endDate, 'yyyy-MM-dd HH:mm')}"></span>
-                Totalpris: <span th:text="|${bookingDto.totalPrice()} kr|"></span>
-            </form>
-            <form th:action="@{/profile/booking/delete}" method="post">
-                <input type="hidden" name="bookingId" th:value="${bookingDto.id}">
-                <button type="submit">Avboka</button>
-            </form>
+    <ul class="bookings-grid">
+        <li class="bookings-list" th:each="bookingDto : ${bookingsDto}">
+            <div class="bookings-columns">
+                <div class="booking-info">
+                    <div class="col background">
+                        <span>Rum: </span>
+                        <span th:text="|${bookingDto.room.beds} Sängar, ${bookingDto.room.extraBeds} extrasängar|"></span><br>
+                        <span>Incheckning: </span>
+                        <span th:text="${#dates.format(bookingDto.startDate, 'yyyy-MM-dd HH:mm')}"></span><br>
+                        <span>Utcheckning: </span>
+                        <span th:text="${#dates.format(bookingDto.endDate, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
+                    <div class="col background">
+                        <span>Storlek: </span>
+                        <span th:text="${bookingDto.room.area} + 'm²'"></span><br>
+                        <span>Pris per natt: </span>
+                        <span th:text="${bookingDto.room.pricePerNight} + ' kr'"></span><br>
+                        <span>Totalpris: </span>
+                        <span th:text="|${bookingDto.totalPrice()} kr|"></span>
+                    </div>
+                </div>
+                <div class="booking-media">
+                    <form th:action="@{/profile/booking/delete}" method="post">
+                        <input type="hidden" name="bookingId" th:value="${bookingDto.id}" />
+                        <button type="submit">Avboka</button>
+                    </form>
 
-            <button type="button" th:onclick="'toggleForm(' + ${bookingDto.id} + ')'">Uppdatera</button>
+                    <button type="button" th:onclick="'toggleForm(' + ${bookingDto.id} + ')'">Ändra</button>
 
-            <form th:action="@{/profile/booking/update}" method="post"
-                  th:id="'update-form-' + ${bookingDto.id}" style="display:none">
-                <input type="hidden" name="bookingId" th:value="${bookingDto.id}" />
-                Ny incheckning: <input type="date" name="start" th:value="${#dates.format(bookingDto.startDate, 'yyyy-MM-dd')}" />
-                Ny utcheckning: <input type="date" name="end" th:value="${#dates.format(bookingDto.endDate, 'yyyy-MM-dd')}" />
-                <button type="submit">Spara</button>
-            </form>
+                    <div class="modal" th:id="'modal-' + ${bookingDto.id}" style="display:none">
+                        <div class="modal-content">
+                            <button class="close" th:onclick="'toggleForm(' + ${bookingDto.id} + ')'">&times;</button>
+                            <form th:action="@{/profile/booking/update}" method="post">
+                                <input type="hidden" name="bookingId" th:value="${bookingDto.id}" />
+                                Ny incheckning:
+                                <input type="date" name="start"
+                                       th:value="${#dates.format(bookingDto.startDate, 'yyyy-MM-dd')}" /><br>
+                                Ny utcheckning:
+                                <input type="date" name="end"
+                                       th:value="${#dates.format(bookingDto.endDate, 'yyyy-MM-dd')}" /><br>
+                                <button type="submit">Spara</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </li>
     </ul>
 </div>
-<br>
-<br>
+
 <form action="/start" method="get">
     <button type="submit">Tillbaka till startsidan</button>
 </form>
-<form action="/profile/user/delete" method="POST" >
-    <button type="submit">Radera konto</button>
-</form>
 
+<div class="notification-popup error" th:if="${error != null}">
+    <span th:text="${error}"></span>
+    <button class="close-notification">×</button>
+</div>
+<div class="notification-popup success" th:if="${session.success}">
+    <span th:text="${session.success}"></span>
+    <button class="close-notification">×</button>
+</div>
 </body>
 </html>
