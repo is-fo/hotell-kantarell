@@ -44,7 +44,7 @@ class BookingServiceTest {
     }
 
     @Test
-    void createBooking_withInvalidRoom_returnsMalformedRoom() {
+    void createBooking_withInvalidRoom() {
         UserDto user = new UserDto(1L, "Test User", "test@example.com");
         Date start = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L);
         Date end = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
@@ -54,10 +54,10 @@ class BookingServiceTest {
     }
 
     @Test
-    void createBooking_withInvalidUser_returnsMalformedUser() {
+    void createBooking_withInvalidUser() {
         List<RoomDto> rooms = roomService.findAvailableRooms(
-                new Date(System.currentTimeMillis() + 24*60*60*1000),
-                new Date(System.currentTimeMillis() + 2*24*60*60*1000),
+                new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000),
+                new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000),
                 1
         );
 
@@ -81,11 +81,5 @@ class BookingServiceTest {
 
         List<RoomDto> rooms = roomService.findAvailableRooms(start, end, 2);
         assertNotNull(rooms);
-    }
-
-    @Test
-    void deleteBooking_returnsTrueOrFalse() {
-        boolean result = bookingService.deleteBooking(1L);
-        assertTrue(result || !result);
     }
 }

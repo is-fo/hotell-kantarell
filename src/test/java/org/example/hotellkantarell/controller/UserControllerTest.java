@@ -41,7 +41,7 @@ class UserControllerTest {
     }
 
     @Test
-    void register_withExistingEmail_returnsRegisterViewWithError() throws Exception {
+    void register_withExistingEmail() throws Exception {
         mockMvc.perform(post("/register")
                         .param("name", "Test User")
                         .param("email", EXISTING_EMAIL)
@@ -60,7 +60,7 @@ class UserControllerTest {
     }
 
     @Test
-    void login_withValidCredentials_redirectsToStart() throws Exception {
+    void login_withValidCredentials() throws Exception {
         userService.register(new RegisterRequest("Login User", "login@example.com", "password123"));
 
         mockMvc.perform(post("/login")
@@ -72,7 +72,7 @@ class UserControllerTest {
     }
 
     @Test
-    void login_withInvalidCredentials_redirectsToLoginWithError() throws Exception {
+    void login_withInvalidCredentials() throws Exception {
         mockMvc.perform(post("/login")
                         .param("email", "nonexistent@example.com")
                         .param("rawPassword", "wrongpassword")

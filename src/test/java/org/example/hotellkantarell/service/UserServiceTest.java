@@ -10,10 +10,9 @@ import org.example.hotellkantarell.repository.UserRepository;
 import org.example.hotellkantarell.status.RegisterStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,7 +33,7 @@ class UserServiceTest {
     }
 
     @Test
-    void register_withExistingEmail_returnsEmailInUse() {
+    void register_withExistingEmail() {
         RegisterRequest request = new RegisterRequest("Test User", "duplicate@example.com", "password123");
         when(userRepository.findByEmail("duplicate@example.com")).thenReturn(new User());
 
@@ -45,28 +44,28 @@ class UserServiceTest {
     }
 
     @Test
-    void register_withMissingName_returnsMissingName() {
+    void register_withMissingName() {
         RegisterRequest request = new RegisterRequest("", "test@example.com", "password123");
         RegisterStatus status = userService.register(request);
         assertEquals(RegisterStatus.MISSING_NAME, status);
     }
 
     @Test
-    void register_withMissingEmail_returnsMissingEmail() {
+    void register_withMissingEmail() {
         RegisterRequest request = new RegisterRequest("Test User", "", "password123");
         RegisterStatus status = userService.register(request);
         assertEquals(RegisterStatus.MISSING_EMAIL, status);
     }
 
     @Test
-    void register_withMissingPassword_returnsMissingPassword() {
+    void register_withMissingPassword() {
         RegisterRequest request = new RegisterRequest("Test User", "test@example.com", "");
         RegisterStatus status = userService.register(request);
         assertEquals(RegisterStatus.MISSING_PASSWORD, status);
     }
 
     @Test
-    void register_withValidData_returnsSuccess() {
+    void register_withValidData() {
         RegisterRequest request = new RegisterRequest("Test User", "unique@example.com", "password123");
         when(userRepository.findByEmail("unique@example.com")).thenReturn(null);
         when(passwordEncoder.encode("password123")).thenReturn("hashedPassword");
@@ -79,7 +78,7 @@ class UserServiceTest {
     }
 
     @Test
-    void login_withValidCredentials_returnsUserDto() {
+    void login_withValidCredentials() {
         LoginRequest loginRequest = new LoginRequest("user@example.com", "password123");
         User user = new User();
         user.setEmail("user@example.com");
@@ -96,7 +95,7 @@ class UserServiceTest {
     }
 
     @Test
-    void login_withInvalidPassword_returnsNull() {
+    void login_withInvalidPassword() {
         LoginRequest loginRequest = new LoginRequest("user@example.com", "wrongpassword");
         User user = new User();
         user.setPasswordHash("hashedPassword");
@@ -110,7 +109,7 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUser_withNoBookings_returnsTrue_andInvalidatesSession() {
+    void deleteUser_withNoBookings() {
         UserDto userDto = new UserDto(1L, "Test User", "user@example.com");
         User user = new User();
         user.setId(1L);

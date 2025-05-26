@@ -19,14 +19,14 @@ class ProfileControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void showProfile_withoutUser_redirectsToLogin() throws Exception {
+    void showProfile_withoutUser() throws Exception {
         mockMvc.perform(get("/profile"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
     }
 
     @Test
-    void showProfile_withUser_returnsProfileView() throws Exception {
+    void showProfile_withUser() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
 
@@ -36,7 +36,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void showEditProfile_withUser_returnsEditView() throws Exception {
+    void showEditProfile_withUser() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
 
@@ -46,7 +46,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void editProfile_withValidData_redirectsToProfile() throws Exception {
+    void editProfile_withValidData() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
 
@@ -59,7 +59,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void updatePassword_withValidData_redirectsToProfile() throws Exception {
+    void updatePassword_withValidData() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
 
@@ -71,7 +71,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void deleteBooking_withValidId_redirectsToProfile() throws Exception {
+    void deleteBooking_withValidId() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
 
@@ -83,7 +83,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void updateBooking_withValidData_redirectsToProfile() throws Exception {
+    void updateBooking_withValidData() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
 
