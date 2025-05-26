@@ -28,7 +28,7 @@ class ProfileControllerTest {
     @Test
     void showProfile_withUser() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
+        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
 
         mockMvc.perform(get("/profile").session(session))
                 .andExpect(status().isOk())
@@ -38,7 +38,7 @@ class ProfileControllerTest {
     @Test
     void showEditProfile_withUser() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
+        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
 
         mockMvc.perform(get("/profile/user/update").session(session))
                 .andExpect(status().isOk())
@@ -49,7 +49,7 @@ class ProfileControllerTest {
     @Test
     void deleteBooking_withValidId() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
+        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
 
         mockMvc.perform(post("/profile/booking/delete")
                         .param("bookingId", "1")
@@ -61,7 +61,7 @@ class ProfileControllerTest {
     @Test
     void updateBooking_withValidData() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
+        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
 
         mockMvc.perform(post("/profile/booking/update")
                         .param("bookingId", "1")

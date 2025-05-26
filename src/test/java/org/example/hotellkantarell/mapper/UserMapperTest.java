@@ -16,7 +16,7 @@ class UserMapperTest {
 
     @Test
     void userToDto_convertsCorrectly() {
-        User user = new User(1L, "Test User", "test@example.com", "hashedPassword");
+        User user = new User(1L, "Test Testsson", "test@testsson.com", "hashedPassword");
         UserDto dto = userMapper.userToDto(user);
 
         assertEquals(user.getId(), dto.id());

@@ -45,7 +45,7 @@ class BookingServiceTest {
 
     @Test
     void createBooking_withInvalidRoom() {
-        UserDto user = new UserDto(1L, "Test User", "test@example.com");
+        UserDto user = new UserDto(1L, "Test Testsson", "test@testsson.com");
         Date start = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L);
         Date end = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
 
@@ -65,7 +65,7 @@ class BookingServiceTest {
 
         Long validRoomId = rooms.get(0).id();
 
-        UserDto invalidUser = new UserDto(9999L, "Fake User", "fake@example.com");
+        UserDto invalidUser = new UserDto(9999L, "Fake Testsson", "fake@testsson.com");
         Date start = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L);
         Date end = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
 
