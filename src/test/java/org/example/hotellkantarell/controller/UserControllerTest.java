@@ -1,84 +1,106 @@
 package org.example.hotellkantarell.controller;
 
+import org.example.hotellkantarell.dto.LoginRequest;
 import org.example.hotellkantarell.dto.RegisterRequest;
+import org.example.hotellkantarell.dto.UserDto;
 import org.example.hotellkantarell.service.UserService;
 import org.example.hotellkantarell.status.RegisterStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import jakarta.servlet.http.HttpSession;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 class UserControllerTest {
-/*
-    @Autowired
-    private MockMvc mockMvc;
 
-    @Autowired
+    @Mock
     private UserService userService;
 
-    private final String EXISTING_EMAIL = "duplicate@example.com";
+    @Mock
+    private Model model;
+
+    @Mock
+    private RedirectAttributes redirectAttributes;
+
+    @Mock
+    private HttpSession session;
+
+    @InjectMocks
+    private UserController userController;
 
     @BeforeEach
-    void setup() {
-        userService.register(new RegisterRequest("Existing User", EXISTING_EMAIL, "password123"));
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void showRegisterForm_returnsRegisterView() throws Exception {
-        mockMvc.perform(get("/register"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"));
+    void showRegisterForm_returnsRegisterView() {
+        String viewName = userController.showRegisterForm();
+        assertEquals("register", viewName);
     }
 
     @Test
-    void register_withExistingEmail() throws Exception {
-        mockMvc.perform(post("/register")
-                        .param("name", "Test User")
-                        .param("email", EXISTING_EMAIL)
-                        .param("rawPassword", "password123")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().isOk())
-                .andExpect(view().name("register"))
-                .andExpect(model().attributeExists("error"));
+    void registerUser_withSuccess() {
+        RegisterRequest request = new RegisterRequest("Test Testsson", "test@testsson.com", "password");
+        when(userService.register(any(RegisterRequest.class))).thenReturn(RegisterStatus.SUCCESS);
+
+        String viewName = userController.registerUser(request, redirectAttributes, model);
+
+        assertEquals("redirect:/login", viewName);
+        verify(redirectAttributes).addFlashAttribute("success", RegisterStatus.SUCCESS.getMessage());
+        verify(model, never()).addAttribute(eq("error"), anyString());
     }
 
     @Test
-    void showLoginForm_returnsLoginView() throws Exception {
-        mockMvc.perform(get("/login"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("login"));
+    void registerUser_withFailure() {
+        RegisterRequest request = new RegisterRequest("", "test@testsson.com", "password");
+        when(userService.register(any(RegisterRequest.class))).thenReturn(RegisterStatus.MISSING_NAME);
+
+        String viewName = userController.registerUser(request, redirectAttributes, model);
+
+        assertEquals("register", viewName);
+        verify(model).addAttribute("error", RegisterStatus.MISSING_NAME.getMessage());
+        verify(redirectAttributes, never()).addFlashAttribute(anyString(), anyString());
     }
 
     @Test
-    void login_withValidCredentials() throws Exception {
-        userService.register(new RegisterRequest("Login User", "login@example.com", "password123"));
-
-        mockMvc.perform(post("/login")
-                        .param("email", "login@example.com")
-                        .param("rawPassword", "password123")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/start"));
+    void showLoginForm_returnsLoginView() {
+        String viewName = userController.showLoginForm();
+        assertEquals("login", viewName);
     }
 
     @Test
-    void login_withInvalidCredentials() throws Exception {
-        mockMvc.perform(post("/login")
-                        .param("email", "nonexistent@example.com")
-                        .param("rawPassword", "wrongpassword")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login"))
-                .andExpect(flash().attributeExists("error"));
-    }*/
+    void loginUser_withValidCredentials() {
+        LoginRequest request = new LoginRequest("test@testsson.com", "password");
+        UserDto userDto = new UserDto(1L, "Test Testsson", "test@testsson.com");
+
+        when(userService.login(any(LoginRequest.class))).thenReturn(userDto);
+
+        String viewName = userController.loginUser(request, redirectAttributes, session);
+
+        assertEquals("redirect:/start", viewName);
+        verify(session).setAttribute("user", userDto);
+        verify(redirectAttributes).addFlashAttribute("success", "Välkommen " + userDto.name() + "!");
+    }
+
+    @Test
+    void loginUser_withInvalidCredentials() {
+        LoginRequest request = new LoginRequest("test@testsson.com", "wrongpassword");
+        when(userService.login(any(LoginRequest.class))).thenReturn(null);
+
+        String viewName = userController.loginUser(request, redirectAttributes, session);
+
+        assertEquals("redirect:/login", viewName);
+        verify(session, never()).setAttribute(anyString(), any());
+        verify(redirectAttributes).addFlashAttribute("error", "Fel användarnamn eller lösenord");
+    }
 }

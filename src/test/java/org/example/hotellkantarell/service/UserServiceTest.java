@@ -34,8 +34,8 @@ class UserServiceTest {
 
     @Test
     void register_withExistingEmail() {
-        RegisterRequest request = new RegisterRequest("Test User", "duplicate@example.com", "password123");
-        when(userRepository.findByEmail("duplicate@example.com")).thenReturn(new User());
+        RegisterRequest request = new RegisterRequest("Duplicate Testsson", "duplicate@testsson.com", "password123");
+        when(userRepository.findByEmail("duplicate@testsson.com")).thenReturn(new User());
 
         RegisterStatus status = userService.register(request);
 
@@ -45,29 +45,29 @@ class UserServiceTest {
 
     @Test
     void register_withMissingName() {
-        RegisterRequest request = new RegisterRequest("", "test@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("", "test@testsson.com", "password123");
         RegisterStatus status = userService.register(request);
         assertEquals(RegisterStatus.MISSING_NAME, status);
     }
 
     @Test
     void register_withMissingEmail() {
-        RegisterRequest request = new RegisterRequest("Test User", "", "password123");
+        RegisterRequest request = new RegisterRequest("Test Testsson", "", "password123");
         RegisterStatus status = userService.register(request);
         assertEquals(RegisterStatus.MISSING_EMAIL, status);
     }
 
     @Test
     void register_withMissingPassword() {
-        RegisterRequest request = new RegisterRequest("Test User", "test@example.com", "");
+        RegisterRequest request = new RegisterRequest("Test User", "test@testsson.com", "");
         RegisterStatus status = userService.register(request);
         assertEquals(RegisterStatus.MISSING_PASSWORD, status);
     }
 
     @Test
     void register_withValidData() {
-        RegisterRequest request = new RegisterRequest("Test User", "unique@example.com", "password123");
-        when(userRepository.findByEmail("unique@example.com")).thenReturn(null);
+        RegisterRequest request = new RegisterRequest("Unique Testsson", "unique@testsson.com", "password123");
+        when(userRepository.findByEmail("unique@testsson.com")).thenReturn(null);
         when(passwordEncoder.encode("password123")).thenReturn("hashedPassword");
         when(userRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -79,28 +79,28 @@ class UserServiceTest {
 
     @Test
     void login_withValidCredentials() {
-        LoginRequest loginRequest = new LoginRequest("user@example.com", "password123");
+        LoginRequest loginRequest = new LoginRequest("test@testsson.com", "password123");
         User user = new User();
-        user.setEmail("user@example.com");
+        user.setEmail("test@testsson.com");
         user.setPasswordHash("hashedPassword");
 
-        when(userRepository.findByEmail("user@example.com")).thenReturn(user);
+        when(userRepository.findByEmail("test@testsson.com")).thenReturn(user);
         when(passwordEncoder.matches("password123", "hashedPassword")).thenReturn(true);
-        when(userMapper.userToDto(user)).thenReturn(new UserDto(1L, "Test User", "user@example.com"));
+        when(userMapper.userToDto(user)).thenReturn(new UserDto(1L, "Test Testsson", "test@testsson.com"));
 
         UserDto userDto = userService.login(loginRequest);
 
         assertNotNull(userDto);
-        assertEquals("user@example.com", userDto.email());
+        assertEquals("test@testsson.com", userDto.email());
     }
 
     @Test
     void login_withInvalidPassword() {
-        LoginRequest loginRequest = new LoginRequest("user@example.com", "wrongpassword");
+        LoginRequest loginRequest = new LoginRequest("test@testsson.com", "wrongpassword");
         User user = new User();
         user.setPasswordHash("hashedPassword");
 
-        when(userRepository.findByEmail("user@example.com")).thenReturn(user);
+        when(userRepository.findByEmail("test@testsson.com")).thenReturn(user);
         when(passwordEncoder.matches("wrongpassword", "hashedPassword")).thenReturn(false);
 
         UserDto userDto = userService.login(loginRequest);
@@ -110,7 +110,7 @@ class UserServiceTest {
 
     @Test
     void deleteUser_withNoBookings() {
-        UserDto userDto = new UserDto(1L, "Test User", "user@example.com");
+        UserDto userDto = new UserDto(1L, "Test Testsson", "test@testsson.com");
         User user = new User();
         user.setId(1L);
 
@@ -127,8 +127,8 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUser_withBookings_returnsFalse() {
-        UserDto userDto = new UserDto(1L, "Test User", "user@example.com");
+    void deleteUser_withBookings() {
+        UserDto userDto = new UserDto(1L, "Test Testsson", "test@testsson.com");
         User user = new User();
 
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
