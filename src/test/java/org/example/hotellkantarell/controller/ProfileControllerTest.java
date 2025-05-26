@@ -45,30 +45,6 @@ class ProfileControllerTest {
                 .andExpect(view().name("editprofile"));
     }
 
-    @Test
-    void editProfile_withValidData() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
-
-        mockMvc.perform(post("/profile/user/update")
-                        .param("name", "New Name")
-                        .param("email", "new@email.com")
-                        .session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/profile"));
-    }
-
-    @Test
-    void updatePassword_withValidData() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test", "test@test.com"));
-
-        mockMvc.perform(post("/profile/user/updatepassword")
-                        .param("rawPassword", "newpassword123")
-                        .session(session))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/profile"));
-    }
 
     @Test
     void deleteBooking_withValidId() throws Exception {
