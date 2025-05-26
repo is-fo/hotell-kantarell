@@ -18,9 +18,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/FUCK/**")
+                .securityMatcher("/blabla/**")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/FUCK/you").hasRole("FUCK")
+                        .requestMatchers("/blabla/bla").hasRole("blablabla")
                         .anyRequest().authenticated());
 
         return http.build();

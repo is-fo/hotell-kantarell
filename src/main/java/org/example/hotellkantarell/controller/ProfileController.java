@@ -71,7 +71,13 @@ public class ProfileController {
             return "editprofile";
         }
 
-        userService.editProfile(currentUser, editProfileRequest, redirectAttributes, session);
+        UserDto updatedUser = userService.editProfile(currentUser, editProfileRequest);
+        if (updatedUser != null) {
+            redirectAttributes.addFlashAttribute("success", "Användaruppgifter uppdaterade.");
+            session.setAttribute("user", updatedUser);
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Den angivna mailadressen är upptagen.");
+        }
 
         return "redirect:/profile";
     }
@@ -83,12 +89,16 @@ public class ProfileController {
             return "redirect:/login";
         }
 
-        userService.editPassword(currentUser, editPasswordRequest, redirectAttributes, session);
+        if (userService.editPassword(currentUser, editPasswordRequest)) {
+            redirectAttributes.addFlashAttribute("success", "Ändrade lösenordet!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Lösenordet måste vara minst 6 karaktärer.");
+        }
         return "redirect:/profile";
     }
 
     @GetMapping("/profile/user/updatepassword")
-    public String showUpdatePasswordForm(HttpSession session, Model model) {
+    public String showUpdatePasswordForm(HttpSession session) {
         UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
@@ -113,22 +123,20 @@ public class ProfileController {
 
     @PostMapping("/profile/booking/delete")
     public String deleteBooking(HttpSession session, @RequestParam Long bookingId, Model model) {
-        BookingDto booking = bookingService.findById(bookingId);
         UserDto user = (UserDto) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
-        } else if (
-                booking == null ||
-                        !user.name().equals(booking.user().name()) ||
-                        !bookingService.deleteBooking(booking.id())
-        ) {
+        }
+
+        boolean success = bookingService.deleteBooking(bookingId, user);
+        if (!success) {
             model.addAttribute("error", "Kunde inte ta bort bokningen. Försök igen.");
             System.err.println("Kunde inte ta bort bokning med id: " + bookingId);
-            return "redirect:/profile";
         }
 
         return "redirect:/profile";
     }
+
 
     @PostMapping("profile/booking/update")
     public String updateBooking(HttpSession session,

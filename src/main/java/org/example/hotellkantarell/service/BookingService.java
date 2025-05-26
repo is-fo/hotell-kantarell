@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.example.hotellkantarell.status.BookingStatus.*;
+import static org.example.hotellkantarell.util.DateUtil.*;
 
 @Service
 public class BookingService {
@@ -28,34 +29,21 @@ public class BookingService {
     private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
-    private final RoomMapper roomMapper;
     private final UserRepository userRepository;
 
-    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, RoomMapper roomMapper, UserRepository userRepository) {
+    public BookingService(RoomRepository roomRepository, BookingRepository bookingRepository, BookingMapper bookingMapper, UserRepository userRepository) {
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
-        this.roomMapper = roomMapper;
         this.userRepository = userRepository;
     }
 
     public List<BookingDto> findBookingByUser(UserDto user) {
-        List<BookingDto> bookings = bookingRepository.findByUserId(user.id()).stream()
+
+        return bookingRepository.findByUserId(user.id()).stream()
                 .map(bookingMapper::bookingToDto)
                 .sorted(Comparator.comparing(BookingDto::startDate))
                 .collect(Collectors.toList());
-
-        return bookings;
-    }
-
-    private Date setTime(Date date, int hour) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
     }
 
     public BookingStatus createBooking(Long roomId, UserDto userDto, Date start, Date end) {
@@ -87,29 +75,6 @@ public class BookingService {
 
         bookingRepository.save(booking);
         return SUCCESS;
-    }
-
-    public List<RoomDto> findAvailableRooms(Date startDate, Date endDate, int guests) {
-        Date start = setTime(startDate, 16);
-        Date end = setTime(endDate, 12);
-
-        List<RoomDto> allRooms = roomRepository.findAll().stream().map(roomMapper::roomToDto).toList();
-
-        return allRooms.stream()
-                .filter(room -> {
-                    int capacity = room.beds() + room.extraBeds();
-                    return guests <= capacity;
-                })
-                .filter(room -> {
-                    List<Booking> bookings = bookingRepository.findByRoomId(room.id());
-                    for (Booking booking : bookings) {
-                        if (!(end.compareTo(booking.getStartDate()) <= 0 || start.compareTo(booking.getEndDate()) >= 0)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
     }
 
     public BookingStatus updateBooking(UserDto user, Long id, Date start, Date end) {
@@ -146,6 +111,15 @@ public class BookingService {
         return SUCCESS;
     }
 
+    public boolean deleteBooking(Long bookingId, UserDto user) {
+        BookingDto booking = findById(bookingId);
+        if (booking == null || !user.name().equals(booking.user().name())) {
+            return false;
+        }
+
+        return deleteBooking(booking.id());
+    }
+
     public boolean deleteBooking(Long id) {
         if (!bookingRepository.existsById(id)) {
             return false;
@@ -170,21 +144,7 @@ public class BookingService {
         return booking != null ? bookingMapper.bookingToDto(booking) : null;
     }
 
-    public boolean validDates(Date start, Date end) {
 
-        Date today = Date.from(LocalDate.now()
-                .atStartOfDay(ZoneId.systemDefault())
-                .toInstant());
-
-        boolean validDates = true;
-
-        if (start != null && end != null) {
-            if (start.after(end) || start.before(today) || end.equals(start)) {
-                validDates = false;
-            }
-        }
-        return validDates;
-    }
 
 
 }

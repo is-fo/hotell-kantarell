@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.example.hotellkantarell.status.BookingStatus.*;
+import static org.example.hotellkantarell.util.DateUtil.validDates;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -18,26 +19,28 @@ class BookingServiceTest {
 
     @Autowired
     private BookingService bookingService;
+    @Autowired
+    private RoomService roomService;
 
     @Test
     void validDates_withValidDates() {
         Date start = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L);
         Date end = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
-        assertTrue(bookingService.validDates(start, end));
+        assertTrue(validDates(start, end));
     }
 
     @Test
     void validDates_withStartBeforeToday() {
         Date start = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L);
         Date end = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L);
-        assertFalse(bookingService.validDates(start, end));
+        assertFalse(validDates(start, end));
     }
 
     @Test
     void validDates_withEndBeforeStart() {
         Date start = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
         Date end = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L);
-        assertFalse(bookingService.validDates(start, end));
+        assertFalse(validDates(start, end));
     }
 
     @Test
@@ -52,7 +55,7 @@ class BookingServiceTest {
 
     @Test
     void createBooking_withInvalidUser_returnsMalformedUser() {
-        List<RoomDto> rooms = bookingService.findAvailableRooms(
+        List<RoomDto> rooms = roomService.findAvailableRooms(
                 new Date(System.currentTimeMillis() + 24*60*60*1000),
                 new Date(System.currentTimeMillis() + 2*24*60*60*1000),
                 1
@@ -76,7 +79,7 @@ class BookingServiceTest {
         Date start = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000L);
         Date end = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
 
-        List<RoomDto> rooms = bookingService.findAvailableRooms(start, end, 2);
+        List<RoomDto> rooms = roomService.findAvailableRooms(start, end, 2);
         assertNotNull(rooms);
     }
 

@@ -72,7 +72,7 @@ public class UserService {
         return true;
     }
 
-    public boolean editProfile(UserDto userDto, @Valid @ModelAttribute EditProfileRequest request, RedirectAttributes redirectAttributes, HttpSession session) {
+    public UserDto editProfile(UserDto userDto, EditProfileRequest request) {
         User user = userRepository.findById(userDto.id()).orElse(null);
         if (user == null) {
             throw new NullPointerException();
@@ -82,28 +82,22 @@ public class UserService {
         }
 
         if (request.email() != null && !request.email().isBlank()) {
-            if (userRepository.findByEmail(request.email()) == null) {
+            User existing = userRepository.findByEmail(request.email());
+            if (existing == null || existing.getId().equals(userDto.id())) {
                 user.setEmail(request.email());
-            } else {
-                redirectAttributes.addFlashAttribute("error", "Den angivna mailadressen är upptagen.");
-                return false;
             }
         }
-        session.setAttribute("user", userMapper.userToDto(user));
-        redirectAttributes.addFlashAttribute("success", "Användaruppgifter uppdaterade.");
-
-        return true;
+        userRepository.save(user);
+        return userMapper.userToDto(user);
     }
 
-    public boolean editPassword(UserDto userDto, @ModelAttribute EditPasswordRequest request, RedirectAttributes redirectAttributes, HttpSession session) {
+    public boolean editPassword(UserDto userDto, EditPasswordRequest request) {
         User user = userMapper.dtoToUser(userDto);
         if (request.rawPassword() != null && request.rawPassword().length() > 5) {
             user.setPasswordHash(passwordEncoder.encode(request.rawPassword()));
-            session.setAttribute("user", userMapper.userToDto(userRepository.save(user)));
-            redirectAttributes.addFlashAttribute("success", "Ändrade lösenordet!");
+            userRepository.save(user);
             return true;
         } else {
-            redirectAttributes.addFlashAttribute("error", "Lösenordet måste vara minst 6 karaktärer.");
             return false;
         }
     }

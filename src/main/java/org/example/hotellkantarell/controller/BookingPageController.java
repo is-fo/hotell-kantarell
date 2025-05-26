@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+
+import static org.example.hotellkantarell.util.DateUtil.*;
+
 
 
 @Controller
@@ -39,12 +39,12 @@ public class BookingPageController {
             Model model) {
 
 
-        if (!bookingService.validDates(start, end)) {
+        if (!validDates(start, end)) {
             model.addAttribute("error", "Ogiltigt datum, försök igen.");
         }
 
-        if (start != null && end != null && guests != null && bookingService.validDates(start, end)) {
-            List<RoomDto> results = bookingService.findAvailableRooms(start, end, guests);
+        if (start != null && end != null && guests != null && validDates(start, end)) {
+            List<RoomDto> results = roomService.findAvailableRooms(start, end, guests);
             model.addAttribute("results", results);
             model.addAttribute("start", start);
             model.addAttribute("end", end);
