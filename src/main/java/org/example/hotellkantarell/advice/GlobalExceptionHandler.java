@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,5 +17,10 @@ public class GlobalExceptionHandler {
         }
 
         return "error"; //om användaren inte är felet, då får vi lägga till felhantering för det
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public String handle404() {
+        return "redirect:/login";
     }
 }
