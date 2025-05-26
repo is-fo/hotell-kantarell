@@ -33,21 +33,25 @@ public class UserService {
     }
 
     public RegisterStatus register(RegisterRequest registerRequest) {
+        if (registerRequest.email() == null || registerRequest.email().isEmpty()) {
+            return RegisterStatus.MISSING_EMAIL;
+        }
+        if (registerRequest.name() == null || registerRequest.name().isEmpty()) {
+            return RegisterStatus.MISSING_NAME;
+        }
+        if (registerRequest.rawPassword() == null || registerRequest.rawPassword().isEmpty()) {
+            return RegisterStatus.MISSING_PASSWORD;
+        }
         if (userRepository.findByEmail(registerRequest.email()) != null) {
             return RegisterStatus.EMAIL_IN_USE;
-        }else if (registerRequest.name() == null || registerRequest.name().isEmpty()) {
-            return RegisterStatus.MISSING_NAME;
-        } else if (registerRequest.email() == null || registerRequest.email().isEmpty()) {
-            return RegisterStatus.MISSING_EMAIL;
-        } else if(registerRequest.rawPassword() == null || registerRequest.rawPassword().isEmpty()) {
-            return RegisterStatus.MISSING_PASSWORD;
-        } else{
+        }
+
         userRepository.save(new User(
                 registerRequest.name(),
                 registerRequest.email(),
                 passwordEncoder.encode(registerRequest.rawPassword())));
         return RegisterStatus.SUCCESS;
-        }
+
     }
 
     public UserDto login(LoginRequest loginRequest) {
