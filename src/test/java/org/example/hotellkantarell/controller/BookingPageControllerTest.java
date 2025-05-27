@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.example.hotellkantarell.util.DateUtil.validDates;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,10 +39,19 @@ class BookingPageControllerTest {
     @Autowired
     private RoomService roomService;
 
+    @Autowired
+    BookingPageController bookingPageController;
+
     @BeforeEach
     void setup() {
         reset(bookingService);
     }
+
+    @Test
+    void controllerLoads() {
+        assertNotNull(bookingPageController);
+    }
+
 
     @Test
     void findAvailableRooms_withValidParams() throws Exception {
