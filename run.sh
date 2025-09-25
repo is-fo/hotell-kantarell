@@ -1,0 +1,1 @@
+java -jar $(ls build/libs/*-SNAPSHOT.jar | head -n 1)
