@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 
+import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -102,5 +103,11 @@ class UserControllerTest {
         assertEquals("redirect:/login", viewName);
         verify(session, never()).setAttribute(anyString(), any());
         verify(redirectAttributes).addFlashAttribute("error", "Fel användarnamn eller lösenord");
+    }
+
+    @Test
+    void failtest3() {
+        boolean asd = false;
+        assertEquals(true, asd);
     }
 }
