@@ -1,6 +1,7 @@
 package org.example.hotellkantarell.controller;
 
 import org.example.hotellkantarell.dto.UserDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +19,14 @@ class ProfileControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    MockHttpSession session;
+
+    @BeforeEach
+    void setUp() {
+        session = new MockHttpSession();
+        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
+    }
+
     @Test
     void showProfile_withoutUser() throws Exception {
         mockMvc.perform(get("/profile"))
@@ -27,19 +36,13 @@ class ProfileControllerTest {
 
     @Test
     void showProfile_withUser() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
-
         mockMvc.perform(get("/profile").session(session))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"));
     }
 
-    /*@Test
+    @Test
     void showEditProfile_withUser() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
-
         mockMvc.perform(get("/profile/user/update").session(session))
                 .andExpect(status().isOk())
                 .andExpect(view().name("editprofile"));
@@ -48,9 +51,6 @@ class ProfileControllerTest {
 
     @Test
     void deleteBooking_withValidId() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
-
         mockMvc.perform(post("/profile/booking/delete")
                         .param("bookingId", "1")
                         .session(session))
@@ -60,9 +60,6 @@ class ProfileControllerTest {
 
     @Test
     void updateBooking_withValidData() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("user", new UserDto(1L, "Test Testsson", "test@testsson.com"));
-
         mockMvc.perform(post("/profile/booking/update")
                         .param("bookingId", "1")
                         .param("start", "2025-01-01")
@@ -70,5 +67,5 @@ class ProfileControllerTest {
                         .session(session))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/profile"));
-    }*/
+    }
 }
