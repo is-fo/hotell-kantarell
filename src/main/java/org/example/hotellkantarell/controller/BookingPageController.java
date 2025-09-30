@@ -55,6 +55,7 @@ public class BookingPageController {
         return "start";
     }
 
+
     @PostMapping("/book")
     public String bookRoom(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
